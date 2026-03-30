@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp">
+
+        <Button
+            android:id="@+id/btnBackFromCollection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Назад"
+            android:backgroundTint="#333333"
+            android:textColor="#FFFFFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="МОЯТА КОЛЕКЦИЯ"
+            android:textColor="#FFD700"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tvEmptyCollection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Все още не си открил никакви исторически обекти.\n\nОтиди на картата, намери локация и стартирай AR куеста, за да попълниш колекцията си!"
+        android:textColor="#888888"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:visibility="visible" /> <androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/rvCollection"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone" /> </LinearLayout>
