@@ -36,23 +36,24 @@ android {
 }
 
 dependencies {
+    implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation("com.google.ar:core:1.41.0")
+    implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     // 1. MVVM Архитектура (ViewModel и LiveData)
-    implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-livedata:2.8.0")
 
     // 2. Google ARCore (За Добавената реалност - AR Bonus)
-    implementation("com.google.ar:core:1.41.0")
     // Sceneform (Улеснява работата с 3D модели в Java)
-    implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
 
     // 3. Google Maps и Местоположение (GPS)
     implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.android.gms:play-services-location:21.2.0")
 }

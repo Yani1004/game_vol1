@@ -6,14 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
-
-    <uses-feature
-        android:name="android.hardware.camera.ar"
-        android:required="true" />
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -24,22 +16,34 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Game_vol1">
         <activity
-            android:name=".CollectionActivity"
+            android:name=".TeamActivity"
             android:exported="false" />
         <activity
-            android:name=".QuestsActivity"
+            android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".ARQuestActivity"
+            android:name=".ExplorerMapActivity"
             android:exported="false" />
         <activity
-            android:name=".MainMenuActivity"
+            android:name=".DiscoveriesActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".GoalsActivity"
             android:exported="false" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".RoundSummaryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GeoGameActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GeoMenuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GeoLoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GeoSplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,10 +51,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBZvqaDJUBnUKYb6adi3tpkKSLO-o7d13Y" />
