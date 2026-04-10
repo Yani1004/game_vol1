@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F172A"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="30dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="Enter The Lobby"
+        android:textColor="#F8FAFC"
+        android:textSize="36sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:text="Pick a nickname and start chasing perfect map pins."
+        android:textColor="#94A3B8"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/etNickname"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="15dp"
+        android:background="#1E293B"
+        android:hint="Nickname"
+        android:inputType="textPersonName"
+        android:paddingStart="15dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#64748B" />
+
+    <EditText
+        android:id="@+id/etCodeword"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="30dp"
+        android:background="#1E293B"
+        android:hint="Secret word"
+        android:inputType="textPassword"
+        android:paddingStart="15dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#64748B" />
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:backgroundTint="#38BDF8"
+        android:text="START HUNT"
+        android:textColor="#082F49"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

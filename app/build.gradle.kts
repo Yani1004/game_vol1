@@ -32,6 +32,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
 }
 
@@ -43,6 +44,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.livedata.ktx)
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("com.google.ar:core:1.41.0")
     implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
