@@ -1,8 +1,7 @@
-package com.example.game_vol1
+﻿package com.example.game_vol1
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.game_vol1.data.GameRepository
@@ -24,11 +23,23 @@ class DiscoveriesActivity : AppCompatActivity() {
     private fun renderScreen() {
         val emptyText = findViewById<TextView>(R.id.tvEmptyCollection)
         val listText = findViewById<TextView>(R.id.tvCollectionList)
+        val summaryLabel = findViewById<TextView>(R.id.tvHistorySummaryLabel)
+        val summaryView = findViewById<TextView>(R.id.tvHistorySummary)
+        val summaryHint = findViewById<TextView>(R.id.tvHistorySummaryHint)
         val visits = GameRepository.loadVisits(this)
         val isBg = UiLanguageStore.isBulgarian(this)
+        val totalPoints = visits.sumOf { it.pointsEarned }
 
         findViewById<TextView>(R.id.tvHistorySection).text = UiLanguageStore.pick(this, "История", "History")
         findViewById<TextView>(R.id.tvHistoryTitle).text = UiLanguageStore.pick(this, "Посетени места", "Places You've Visited")
+        summaryLabel.text = UiLanguageStore.pick(this, "Статистика", "Journey Stats")
+        summaryView.text = if (isBg) "${visits.size} открити места" else "${visits.size} places discovered"
+        summaryHint.text =
+            if (isBg) {
+                "Събрани точки от историята: $totalPoints. Всяко място пази време на посещение и кратка информация."
+            } else {
+                "Points collected from your journey: $totalPoints. Every place keeps its visit time and story."
+            }
 
         if (visits.isEmpty()) {
             emptyText.visibility = View.VISIBLE
@@ -45,12 +56,10 @@ class DiscoveriesActivity : AppCompatActivity() {
                 val place = GameRepository.placeById(visit.placeId)
                 if (place == null) {
                     UiLanguageStore.pick(this, "Неизвестно място", "Unknown place")
+                } else if (isBg) {
+                    "${place.title}\n${place.city}, ${place.country}\nПосетено: ${GameRepository.formatVisitTime(visit.visitedAtEpochMs)}\nТочки: ${visit.pointsEarned}\n${place.historicalInfo}"
                 } else {
-                    if (isBg) {
-                        "${place.title}\n${place.city}, ${place.country}\nПосетено: ${GameRepository.formatVisitTime(visit.visitedAtEpochMs)}\nТочки: ${visit.pointsEarned}\n${place.historicalInfo}"
-                    } else {
-                        "${place.title}\n${place.city}, ${place.country}\nVisited: ${GameRepository.formatVisitTime(visit.visitedAtEpochMs)}\nPoints: ${visit.pointsEarned}\n${place.historicalInfo}"
-                    }
+                    "${place.title}\n${place.city}, ${place.country}\nVisited: ${GameRepository.formatVisitTime(visit.visitedAtEpochMs)}\nPoints: ${visit.pointsEarned}\n${place.historicalInfo}"
                 }
             }
         }

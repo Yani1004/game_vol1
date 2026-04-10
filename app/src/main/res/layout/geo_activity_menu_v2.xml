@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -34,25 +34,89 @@
                 android:layout_marginTop="8dp"
                 android:text="Explorer"
                 android:textColor="#FFFFFF"
-                android:textSize="32sp"
+                android:textSize="34sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvMenuStats"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvProfileIntro"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Visited 0 places • Score 0"
+                android:layout_marginTop="8dp"
+                android:text="Your base for exploring landmarks, teams, and daily goals."
                 android:textColor="#B8C7E0"
                 android:textSize="15sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="88dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_dark_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvVisitedValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvVisitedLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Places visited"
+                        android:textColor="#9FB6D8"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="88dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_dark_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvScoreValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvScoreLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Total score"
+                        android:textColor="#9FB6D8"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
                 android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="22dp">
 
                 <TextView
                     android:id="@+id/tvRouteLabel"
@@ -70,14 +134,23 @@
                     android:layout_marginTop="10dp"
                     android:text="Today's challenge"
                     android:textColor="#08111E"
-                    android:textSize="20sp"
+                    android:textSize="24sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvDailySubcopy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Head out, discover a place, and keep your streak alive."
+                    android:textColor="#334155"
+                    android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/btnPlayRun"
                     android:layout_width="match_parent"
                     android:layout_height="54dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="18dp"
                     android:background="@drawable/bg_accent_button"
                     android:text="Jump Into Explore"
                     android:textAllCaps="false"
@@ -85,138 +158,180 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/tvQuickActionsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Quick Actions"
+                android:textColor="#8FB4FF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:orientation="vertical">
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="2">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="140dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_dark_card"
-                        android:orientation="vertical"
-                        android:padding="18dp">
-
-                        <TextView
-                            android:id="@+id/tvHistoryCardTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="History"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvProfileHistoryHint"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Revisit your discovered landmarks and notes."
-                            android:textColor="#B8C7E0"
-                            android:textSize="13sp" />
-
-                        <Button
-                            android:id="@+id/btnCollectionNew"
-                            android:layout_width="match_parent"
-                            android:layout_height="44dp"
-                            android:layout_marginTop="12dp"
-                            android:background="@drawable/bg_secondary_button"
-                            android:text="Open"
-                            android:textAllCaps="false"
-                            android:textColor="#FFFFFF" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="140dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_dark_card"
-                        android:orientation="vertical"
-                        android:padding="18dp">
-
-                        <TextView
-                            android:id="@+id/tvDailyCardTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Daily"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvProfileDailyHint"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Track the bonus challenge and completion status."
-                            android:textColor="#B8C7E0"
-                            android:textSize="13sp" />
-
-                        <Button
-                            android:id="@+id/btnGoals"
-                            android:layout_width="match_parent"
-                            android:layout_height="44dp"
-                            android:layout_marginTop="12dp"
-                            android:background="@drawable/bg_secondary_button"
-                            android:text="View"
-                            android:textAllCaps="false"
-                            android:textColor="#FFFFFF" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_width="0dp"
+                    android:layout_height="164dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
                     android:background="@drawable/bg_dark_card"
                     android:orientation="vertical"
                     android:padding="18dp">
 
                     <TextView
-                        android:id="@+id/tvTeamCardTitle"
+                        android:id="@+id/tvHistoryCardTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Team Play"
+                        android:text="History"
                         android:textColor="#FFFFFF"
-                        android:textSize="16sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/tvTeamSummary"
+                        android:id="@+id/tvHistoryCardMeta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="0 places"
+                        android:textColor="#8FB4FF"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvProfileHistoryHint"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Create a team, invite friends, and earn score together."
+                        android:text="Revisit your discovered landmarks and notes."
                         android:textColor="#B8C7E0"
                         android:textSize="13sp" />
 
-                    <Button
-                        android:id="@+id/btnTeam"
+                    <Space
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:layout_marginTop="12dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <Button
+                        android:id="@+id/btnCollectionNew"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
                         android:background="@drawable/bg_secondary_button"
-                        android:text="Open Team Hub"
+                        android:text="Open"
                         android:textAllCaps="false"
                         android:textColor="#FFFFFF" />
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="164dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_dark_card"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:id="@+id/tvDailyCardTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Daily"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvDailyCardMeta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="+150 bonus"
+                        android:textColor="#8FB4FF"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvProfileDailyHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Track the bonus challenge and completion status."
+                        android:textColor="#B8C7E0"
+                        android:textSize="13sp" />
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <Button
+                        android:id="@+id/btnGoals"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:background="@drawable/bg_secondary_button"
+                        android:text="View"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_dark_card"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:id="@+id/tvTeamCardTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Team Play"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTeamMeta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="No active team"
+                    android:textColor="#8FB4FF"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTeamSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Create a team, invite friends, and earn score together."
+                    android:textColor="#B8C7E0"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnTeam"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_secondary_button"
+                    android:text="Open Team Hub"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/bg_secondary_button"
                 android:text="Log Out"
                 android:textAllCaps="false"

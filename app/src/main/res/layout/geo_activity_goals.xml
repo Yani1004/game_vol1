@@ -63,6 +63,28 @@
                     android:textColor="#08111E"
                     android:textSize="22sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvDailyBonus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_secondary_button"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="8dp"
+                    android:text="+150 bonus"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvDailyStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Complete this challenge today."
+                    android:textColor="#334155"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -90,6 +112,15 @@
                     android:text="0 / 0 discovered"
                     android:textColor="#CFE0FF"
                     android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tvCollectionHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Keep exploring to fill your heritage journal."
+                    android:textColor="#9FB6D8"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -114,6 +145,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:lineSpacingExtra="4dp"
                     android:text="Objective"
                     android:textColor="#CFE0FF"
                     android:textSize="16sp" />

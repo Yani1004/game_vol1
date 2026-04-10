@@ -1,4 +1,4 @@
-package com.example.game_vol1
+﻿package com.example.game_vol1
 
 import android.content.Intent
 import android.os.Bundle
@@ -17,24 +17,6 @@ class GeoMenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.geo_activity_menu_v2)
-
-        val profile = GameRepository.loadProfile(this)
-        val daily = GameRepository.getDailyChallenge()
-        val team = GameRepository.loadTeam(this)
-
-        findViewById<TextView>(R.id.tvUsername).text = profile.username
-        findViewById<TextView>(R.id.tvMenuStats).text =
-            "Visited ${profile.visitedCount} places  •  Score ${profile.totalScore}"
-        findViewById<TextView>(R.id.tvDailyHighlight).text =
-            "Today's challenge: ${daily.place.title} (+${daily.bonusPoints})"
-        findViewById<TextView>(R.id.tvMenuStats).text =
-            "Visited ${profile.visitedCount} places | Score ${profile.totalScore}"
-        findViewById<TextView>(R.id.tvTeamSummary).text =
-            if (team.hasTeam) {
-                "${team.teamName} | ${team.memberNames.size} members | Team score ${team.teamScore}"
-            } else {
-                "Create a team, invite friends, and earn score together."
-            }
 
         findViewById<Button>(R.id.btnPlayRun).setOnClickListener {
             startActivity(Intent(this, ExplorerMapActivity::class.java))
@@ -68,14 +50,31 @@ class GeoMenuActivity : AppCompatActivity() {
         val isBg = UiLanguageStore.isBulgarian(this)
 
         findViewById<TextView>(R.id.tvProfileSection).text = UiLanguageStore.pick(this, "Профил", "Profile")
+        findViewById<TextView>(R.id.tvProfileIntro).text =
+            UiLanguageStore.pick(this, "Твоят център за откриване на места, отбори и дневни цели.", "Your base for exploring landmarks, teams, and daily goals.")
+        findViewById<TextView>(R.id.tvVisitedLabel).text = UiLanguageStore.pick(this, "Посетени места", "Places visited")
+        findViewById<TextView>(R.id.tvScoreLabel).text = UiLanguageStore.pick(this, "Общо точки", "Total score")
         findViewById<TextView>(R.id.tvRouteLabel).text = UiLanguageStore.pick(this, "Днешен маршрут", "Today's Route")
+        findViewById<TextView>(R.id.tvDailySubcopy).text =
+            UiLanguageStore.pick(this, "Излез навън, открий място и поддържай прогреса си жив.", "Head out, discover a place, and keep your streak alive.")
+        findViewById<TextView>(R.id.tvQuickActionsLabel).text = UiLanguageStore.pick(this, "Бързи действия", "Quick Actions")
         findViewById<TextView>(R.id.tvHistoryCardTitle).text = UiLanguageStore.pick(this, "История", "History")
+        findViewById<TextView>(R.id.tvHistoryCardMeta).text =
+            if (isBg) "${profile.visitedCount} места" else "${profile.visitedCount} places"
         findViewById<TextView>(R.id.tvProfileHistoryHint).text =
             UiLanguageStore.pick(this, "Прегледай откритите обекти и бележките си.", "Revisit your discovered landmarks and notes.")
         findViewById<TextView>(R.id.tvDailyCardTitle).text = UiLanguageStore.pick(this, "Дневни", "Daily")
+        findViewById<TextView>(R.id.tvDailyCardMeta).text =
+            if (isBg) "+${daily.bonusPoints} бонус" else "+${daily.bonusPoints} bonus"
         findViewById<TextView>(R.id.tvProfileDailyHint).text =
             UiLanguageStore.pick(this, "Следи бонус задачата и статуса на изпълнение.", "Track the bonus challenge and completion status.")
         findViewById<TextView>(R.id.tvTeamCardTitle).text = UiLanguageStore.pick(this, "Отбор", "Team Play")
+        findViewById<TextView>(R.id.tvTeamMeta).text =
+            if (team.hasTeam) {
+                if (isBg) "${team.memberNames.size} членове" else "${team.memberNames.size} members"
+            } else {
+                UiLanguageStore.pick(this, "Нямаш активен отбор", "No active team")
+            }
         findViewById<Button>(R.id.btnPlayRun).text = UiLanguageStore.pick(this, "Към картата", "Jump Into Explore")
         findViewById<Button>(R.id.btnCollectionNew).text = UiLanguageStore.pick(this, "Отвори", "Open")
         findViewById<Button>(R.id.btnGoals).text = UiLanguageStore.pick(this, "Виж", "View")
@@ -83,16 +82,18 @@ class GeoMenuActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnLogout).text = UiLanguageStore.pick(this, "Изход", "Log Out")
 
         findViewById<TextView>(R.id.tvUsername).text = profile.username
-        findViewById<TextView>(R.id.tvMenuStats).text =
-            if (isBg) "Посетени места ${profile.visitedCount} | Точки ${profile.totalScore}"
-            else "Visited ${profile.visitedCount} places | Score ${profile.totalScore}"
+        findViewById<TextView>(R.id.tvVisitedValue).text = profile.visitedCount.toString()
+        findViewById<TextView>(R.id.tvScoreValue).text = profile.totalScore.toString()
         findViewById<TextView>(R.id.tvDailyHighlight).text =
-            if (isBg) "Днешно предизвикателство: ${daily.place.title} (+${daily.bonusPoints})"
-            else "Today's challenge: ${daily.place.title} (+${daily.bonusPoints})"
+            if (isBg) "${daily.place.title} (+${daily.bonusPoints})"
+            else "${daily.place.title} (+${daily.bonusPoints})"
         findViewById<TextView>(R.id.tvTeamSummary).text =
             if (team.hasTeam) {
-                if (isBg) "${team.teamName} | ${team.memberNames.size} членове | Отборни точки ${team.teamScore}"
-                else "${team.teamName} | ${team.memberNames.size} members | Team score ${team.teamScore}"
+                if (isBg) {
+                    "${team.teamName} е твоят активен отбор. Продължете да откривате места и да качвате общия резултат."
+                } else {
+                    "${team.teamName} is your active team. Keep discovering places and push the shared score higher."
+                }
             } else {
                 UiLanguageStore.pick(this, "Създай отбор, покани приятели и трупайте точки заедно.", "Create a team, invite friends, and earn score together.")
             }
