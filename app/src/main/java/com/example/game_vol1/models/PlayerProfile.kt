@@ -7,8 +7,4 @@ data class PlayerProfile(
     val visitedCount: Int = 0,
     val discoveredPlaceIds: Set<String> = emptySet(),
     val completedDailyDate: String = "",
-    val bestRunScore: Int = 0,
-    val lastRunScore: Int = 0,
-    val gamesPlayed: Int = 0,
-    val discoveredPoiIds: Set<String> = discoveredPlaceIds,
 )

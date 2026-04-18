@@ -3,7 +3,6 @@ package com.example.game_vol1.data
 import android.content.Context
 import com.example.game_vol1.models.DailyChallenge
 import com.example.game_vol1.models.HeritagePlace
-import com.example.game_vol1.models.LandmarkRound
 import com.example.game_vol1.models.PlaceVisit
 import com.example.game_vol1.models.PlayerProfile
 import com.example.game_vol1.models.TeamInfo
@@ -36,21 +35,6 @@ object GameRepository {
         HeritagePlace("nessebar_old_town", "Old Nessebar", "Nessebar", "Bulgaria", 42.6598, 27.7360, "A historic peninsula town with churches, stone streets, and sea views.", "Nessebar has Thracian, Greek, Roman, and Byzantine layers of history and is listed as a UNESCO World Heritage site.", "Historic Town"),
         HeritagePlace("belogradchik_rocks", "Belogradchik Rocks", "Belogradchik", "Bulgaria", 43.6271, 22.6838, "Towering red rock formations paired with an old fortress.", "The natural rock formations stretch across a vast area and have inspired legends, local names, and strategic fortification for centuries.", "Natural Wonder"),
     )
-
-    fun getAllRounds(): List<LandmarkRound> = getPlaces().map { place ->
-        LandmarkRound(
-            id = place.id,
-            title = place.title,
-            city = place.city,
-            country = place.country,
-            clue = place.shortDescription,
-            funFact = place.historicalInfo,
-            latitude = place.latitude,
-            longitude = place.longitude,
-            difficulty = place.category,
-            unlockScore = 3500,
-        )
-    }
 
     fun hasRegisteredAccount(context: Context): Boolean = prefs(context).getString(KEY_EMAIL, null) != null
 
@@ -245,11 +229,6 @@ object GameRepository {
 
     fun placeById(id: String): HeritagePlace? = getPlaces().firstOrNull { it.id == id }
 
-    fun discoveredRounds(context: Context): List<LandmarkRound> =
-        loadProfile(context).discoveredPlaceIds.mapNotNull { id ->
-            getAllRounds().firstOrNull { it.id == id }
-        }
-
     fun getDailyChallenge(): DailyChallenge {
         val today = LocalDate.now()
         val place = getPlaces()[today.dayOfYear % getPlaces().size]
@@ -265,20 +244,6 @@ object GameRepository {
     fun discoveryRadiusMeters(): Float = DISCOVERY_RADIUS_METERS
 
     fun canDiscover(distanceMeters: Float): Boolean = distanceMeters <= DISCOVERY_RADIUS_METERS
-
-    fun distanceToScore(distanceKm: Double): Int {
-        val raw = 5000 - (distanceKm * 12)
-        return raw.toInt().coerceIn(500, 5000)
-    }
-
-    fun accuracyLabel(distanceKm: Double): String = when {
-        distanceKm < 5 -> "Perfect pin"
-        distanceKm < 25 -> "Excellent"
-        distanceKm < 75 -> "Strong guess"
-        distanceKm < 150 -> "Solid"
-        distanceKm < 300 -> "Close-ish"
-        else -> "Way off"
-    }
 
     fun discoverPlace(context: Context, place: HeritagePlace, userLatitude: Double, userLongitude: Double): DiscoveryOutcome {
         val distance = distanceMeters(userLatitude, userLongitude, place)
@@ -314,17 +279,6 @@ object GameRepository {
         }
 
         return DiscoveryOutcome(true, distance, awardedPoints, dailyBonusAwarded)
-    }
-
-    fun saveGameResult(context: Context, sessionScore: Int, discoveredThisRun: Set<String>) {
-        val current = loadProfile(context)
-        val syntheticVisits = discoveredThisRun.map {
-            PlaceVisit(it, System.currentTimeMillis(), sessionScore / maxOf(1, discoveredThisRun.size))
-        } + loadVisits(context)
-        prefs(context).edit()
-            .putString(KEY_VISITS, syntheticVisits.joinToString(";") { "${it.placeId}|${it.visitedAtEpochMs}|${it.pointsEarned}" })
-            .putInt(KEY_TOTAL_SCORE, current.totalScore + sessionScore)
-            .apply()
     }
 
     fun formatVisitTime(epochMs: Long): String {

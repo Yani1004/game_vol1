@@ -34,12 +34,6 @@
             android:name=".GoalsActivity"
             android:exported="false" />
         <activity
-            android:name=".RoundSummaryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".GeoGameActivity"
-            android:exported="false" />
-        <activity
             android:name=".GeoMenuActivity"
             android:exported="false" />
         <activity
