@@ -28,12 +28,12 @@ object GameRepository {
     private const val DAILY_BONUS_POINTS = 150
 
     fun getPlaces(): List<HeritagePlace> = listOf(
-        HeritagePlace("alexander_nevsky", "Alexander Nevsky Cathedral", "Sofia", "Bulgaria", 42.6953, 23.3328, "A landmark cathedral in central Sofia with striking golden domes.", "Built in the early 20th century, the cathedral honors the Russian soldiers who died during the Russo-Turkish War of 1877-1878.", "Cathedral"),
-        HeritagePlace("rila_monastery", "Rila Monastery", "Rila", "Bulgaria", 42.1338, 23.3405, "A mountain monastery surrounded by dramatic forest scenery.", "Founded in the 10th century by Saint Ivan of Rila, it became one of the country's most important spiritual and cultural centers.", "Monastery"),
-        HeritagePlace("plovdiv_theatre", "Ancient Theatre of Plovdiv", "Plovdiv", "Bulgaria", 42.1466, 24.7510, "A remarkably preserved Roman theatre still used for events today.", "The theatre dates to the 1st century AD and is one of the best-preserved ancient theatres in the Balkans.", "Ancient Site"),
-        HeritagePlace("tsarevets", "Tsarevets Fortress", "Veliko Tarnovo", "Bulgaria", 43.0841, 25.6506, "A hilltop fortress overlooking the old capital of Bulgaria.", "Tsarevets served as the main stronghold of the Second Bulgarian Empire and remains one of the country's most symbolic medieval sites.", "Fortress"),
-        HeritagePlace("nessebar_old_town", "Old Nessebar", "Nessebar", "Bulgaria", 42.6598, 27.7360, "A historic peninsula town with churches, stone streets, and sea views.", "Nessebar has Thracian, Greek, Roman, and Byzantine layers of history and is listed as a UNESCO World Heritage site.", "Historic Town"),
-        HeritagePlace("belogradchik_rocks", "Belogradchik Rocks", "Belogradchik", "Bulgaria", 43.6271, 22.6838, "Towering red rock formations paired with an old fortress.", "The natural rock formations stretch across a vast area and have inspired legends, local names, and strategic fortification for centuries.", "Natural Wonder"),
+        HeritagePlace("alexander_nevsky", "Храм-паметник Александър Невски", "София", "България", 42.6953, 23.3328, "Емблематична катедрала в центъра на София със златни кубета.", "Построена в началото на XX век, катедралата е посветена на загиналите войници в Руско-турската освободителна война от 1877-1878 г.", "Катедрала"),
+        HeritagePlace("rila_monastery", "Рилски манастир", "Рила", "България", 42.1338, 23.3405, "Планински манастир, заобиколен от гори и впечатляваща природа.", "Основан през X век от свети Иван Рилски, манастирът е един от най-важните духовни и културни центрове на България.", "Манастир"),
+        HeritagePlace("plovdiv_theatre", "Античен театър на Филипопол", "Пловдив", "България", 42.1466, 24.7510, "Добре запазен римски театър, който и днес се използва за събития.", "Театърът датира от I век и е сред най-добре съхранените антични театри на Балканите.", "Античен обект"),
+        HeritagePlace("tsarevets", "Крепост Царевец", "Велико Търново", "България", 43.0841, 25.6506, "Средновековна крепост върху хълм над старата българска столица.", "Царевец е главната крепост на Второто българско царство и остава един от най-разпознаваемите символи на средновековна България.", "Крепост"),
+        HeritagePlace("nessebar_old_town", "Старият Несебър", "Несебър", "България", 42.6598, 27.7360, "Исторически полуостров с църкви, каменни улици и морски гледки.", "Несебър съчетава тракийско, гръцко, римско и византийско наследство и е част от списъка на световното наследство на ЮНЕСКО.", "Исторически град"),
+        HeritagePlace("belogradchik_rocks", "Белоградчишки скали", "Белоградчик", "България", 43.6271, 22.6838, "Внушителни червени скални образувания до стара крепост.", "Скалните форми се простират на голяма площ и са свързани с легенди, местни имена и вековна отбранителна история.", "Природен феномен"),
     )
 
     fun hasRegisteredAccount(context: Context): Boolean = prefs(context).getString(KEY_EMAIL, null) != null
@@ -232,7 +232,7 @@ object GameRepository {
     fun getDailyChallenge(): DailyChallenge {
         val today = LocalDate.now()
         val place = getPlaces()[today.dayOfYear % getPlaces().size]
-        return DailyChallenge(today.toString(), place, DAILY_BONUS_POINTS, "Travel to ${place.title} in ${place.city} and discover it today for a bonus.")
+        return DailyChallenge(today.toString(), place, DAILY_BONUS_POINTS, "Отиди до ${place.title} в ${place.city} и го открий днес за бонус.")
     }
 
     fun distanceMeters(userLatitude: Double, userLongitude: Double, place: HeritagePlace): Float {

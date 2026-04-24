@@ -1,14 +1,23 @@
 ﻿package com.example.game_vol1
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.game_vol1.data.GameRepository
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class GeoMenuActivity : AppCompatActivity() {
+    companion object {
+        private const val NOTIFICATION_PERMISSION_REQUEST = 301
+    }
+
     override fun onResume() {
         super.onResume()
         renderScreen()
@@ -40,7 +49,31 @@ class GeoMenuActivity : AppCompatActivity() {
             finishAffinity()
         }
 
+        setupNotifications()
         renderScreen()
+    }
+
+    private fun setupNotifications() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            NotificationScheduler.ensureDailyReminderScheduled(this)
+            return
+        }
+
+        val hasPermission = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            NotificationScheduler.ensureDailyReminderScheduled(this)
+            return
+        }
+
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+            NOTIFICATION_PERMISSION_REQUEST
+        )
     }
 
     private fun renderScreen() {
@@ -99,5 +132,20 @@ class GeoMenuActivity : AppCompatActivity() {
             }
 
         AppNavigation.bind(this, findViewById<BottomNavigationView>(R.id.bottomNav), R.id.nav_profile)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            NotificationScheduler.ensureDailyReminderScheduled(this)
+        }
     }
 }

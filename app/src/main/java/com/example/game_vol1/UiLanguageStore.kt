@@ -9,7 +9,7 @@ object UiLanguageStore {
     private const val LANGUAGE_EN = "en"
 
     fun isBulgarian(context: Context): Boolean =
-        prefs(context).getString(KEY_LANGUAGE, LANGUAGE_EN) == LANGUAGE_BG
+        prefs(context).getString(KEY_LANGUAGE, LANGUAGE_BG) == LANGUAGE_BG
 
     fun toggle(context: Context): Boolean {
         val nowBulgarian = !isBulgarian(context)

@@ -43,7 +43,7 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private val markerPlaceMap = mutableMapOf<Marker, HeritagePlace>()
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        Toast.makeText(this, UiLanguageStore.pick(this, "???????? ? ????????.", "Camera opened."), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, UiLanguageStore.pick(this, "Камерата е отворена.", "Camera opened."), Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,10 +134,10 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun updateHeader() {
         val profile = GameRepository.loadProfile(this)
         tvExplorerStatus.text = if (currentLocation == null) {
-            if (UiLanguageStore.isBulgarian(this)) "${profile.username} | ????? ${profile.totalScore} | ????????? ?? GPS"
+            if (UiLanguageStore.isBulgarian(this)) "${profile.username} | точки ${profile.totalScore} | изчакване на GPS"
             else "${profile.username} | Score ${profile.totalScore} | Waiting for GPS"
         } else {
-            if (UiLanguageStore.isBulgarian(this)) "${profile.username} | ????? ${profile.totalScore} | GPS ? ?????"
+            if (UiLanguageStore.isBulgarian(this)) "${profile.username} | точки ${profile.totalScore} | GPS е готов"
             else "${profile.username} | Score ${profile.totalScore} | GPS ready"
         }
     }
@@ -145,11 +145,11 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun renderSelectedPlace() {
         val place = selectedPlace
         if (place == null) {
-            tvSelectedPlace.text = UiLanguageStore.pick(this, "?????? ?????? ?? ?????", "Select a place marker")
-            tvDistance.text = UiLanguageStore.pick(this, "?????? ????? ?? ???????, ?? ?? ????? ????????????.", "Choose a landmark on the map to see your distance.")
+            tvSelectedPlace.text = UiLanguageStore.pick(this, "Избери обект от картата", "Select a place marker")
+            tvDistance.text = UiLanguageStore.pick(this, "Докосни маркер, за да видиш разстоянието.", "Choose a landmark on the map to see your distance.")
             tvPlaceInfo.text = UiLanguageStore.pick(
                 this,
-                "????? ?? ???????, ???????? ?? ?? ${GameRepository.discoveryRadiusMeters().toInt()} ????? ? ??????? ??????, ?? ?? ?? ??????? ? ????????? ??.",
+                "Отиди до мястото, приближи се на ${GameRepository.discoveryRadiusMeters().toInt()} метра и натисни Открий, за да го запазиш в историята си.",
                 "Walk to a place, get within ${GameRepository.discoveryRadiusMeters().toInt()} meters, then tap Discover to save it into your history.",
             )
             return
@@ -160,14 +160,14 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val current = currentLocation
         if (current == null) {
-            tvDistance.text = UiLanguageStore.pick(this, "???????????? ?? ?? ?????? ???? ???? GPS ?? ????????.", "Distance unavailable until GPS locks in.")
+            tvDistance.text = UiLanguageStore.pick(this, "Разстоянието ще се покаже след GPS локализация.", "Distance unavailable until GPS locks in.")
             return
         }
 
         val distance = GameRepository.distanceMeters(current.latitude, current.longitude, place)
         tvDistance.text =
             if (UiLanguageStore.isBulgarian(this)) {
-                "??????????: ${distance.toInt()} ? | ${if (GameRepository.canDiscover(distance)) "????? ?? ??????? ???? ????? ????." else "???????? ??, ?? ?? ?? ????????."}"
+                "Разстояние: ${distance.toInt()} м | ${if (GameRepository.canDiscover(distance)) "Можеш да откриеш това място." else "Приближи се, за да го отключиш."}"
             } else {
                 "Distance: ${distance.toInt()} m | ${if (GameRepository.canDiscover(distance)) "You can discover this place now." else "Move closer to unlock it."}"
             }
@@ -177,11 +177,11 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         val place = selectedPlace
         val location = currentLocation
         if (place == null) {
-            Toast.makeText(this, UiLanguageStore.pick(this, "????? ?????? ?????? ?? ?????.", "Choose a place marker first."), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, UiLanguageStore.pick(this, "Първо избери обект от картата.", "Choose a place marker first."), Toast.LENGTH_SHORT).show()
             return
         }
         if (location == null) {
-            Toast.makeText(this, UiLanguageStore.pick(this, "????????? GPS ???????????????? ??.", "Waiting for your GPS location."), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, UiLanguageStore.pick(this, "Изчаква се GPS местоположението ти.", "Waiting for your GPS location."), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -190,7 +190,7 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
             Toast.makeText(
                 this,
                 if (UiLanguageStore.isBulgarian(this)) {
-                    "??????? ?? ?? ${result.distanceMeters.toInt()} ?????. ???????? ?? ? ??????? ?? ${GameRepository.discoveryRadiusMeters().toInt()} ?????."
+                    "Намираш се на ${result.distanceMeters.toInt()} метра. Приближи се в радиус от ${GameRepository.discoveryRadiusMeters().toInt()} метра."
                 } else {
                     "You are ${result.distanceMeters.toInt()} meters away. Move within ${GameRepository.discoveryRadiusMeters().toInt()} meters."
                 },
@@ -203,17 +203,17 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         renderSelectedPlace()
 
         AlertDialog.Builder(this)
-            .setTitle(UiLanguageStore.pick(this, "??????? ? ???????", "Place discovered"))
+            .setTitle(UiLanguageStore.pick(this, "Мястото е открито", "Place discovered"))
             .setMessage(
                 if (UiLanguageStore.isBulgarian(this)) {
-                    "${place.title}\n\n${place.historicalInfo}\n\n????????? ?????: ${result.pointsAwarded}" +
-                        if (result.dailyBonusAwarded) "\n?????? ? ????? ?? ???????? ?????????????????." else ""
+                    "${place.title}\n\n${place.historicalInfo}\n\nСпечелени точки: ${result.pointsAwarded}" +
+                        if (result.dailyBonusAwarded) "\nПолучен е бонус от дневното предизвикателство." else ""
                 } else {
                     "${place.title}\n\n${place.historicalInfo}\n\nPoints earned: ${result.pointsAwarded}" +
                         if (result.dailyBonusAwarded) "\nDaily challenge bonus unlocked." else ""
                 },
             )
-            .setPositiveButton(UiLanguageStore.pick(this, "???????", "Great")) { _, _ -> }
+            .setPositiveButton(UiLanguageStore.pick(this, "Супер", "Great")) { _, _ -> }
             .show()
     }
 
@@ -222,7 +222,7 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         if (intent.resolveActivity(packageManager) != null) {
             cameraLauncher.launch(intent)
         } else {
-            Toast.makeText(this, UiLanguageStore.pick(this, "???? ???????? ?????????? ?? ?????? ?? ???? ??????????.", "No camera app found on this device."), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, UiLanguageStore.pick(this, "Не е намерено приложение за камера на това устройство.", "No camera app found on this device."), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -238,10 +238,10 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun applyLanguage() {
-        findViewById<TextView>(R.id.tvExploreSection).text = UiLanguageStore.pick(this, "?????", "Explore")
-        btnDiscover.text = UiLanguageStore.pick(this, "?????? ???? ?????", "Discover This Place")
-        btnCamera.text = UiLanguageStore.pick(this, "??????", "Camera")
-        btnDaily.text = UiLanguageStore.pick(this, "?????? ??????", "Today's Task")
+        findViewById<TextView>(R.id.tvExploreSection).text = UiLanguageStore.pick(this, "Карта", "Explore")
+        btnDiscover.text = UiLanguageStore.pick(this, "Открий това място", "Discover This Place")
+        btnCamera.text = UiLanguageStore.pick(this, "Камера", "Camera")
+        btnDaily.text = UiLanguageStore.pick(this, "Днешна задача", "Today's Task")
         AppNavigation.bind(this, findViewById<BottomNavigationView>(R.id.bottomNav), R.id.nav_explore)
     }
 }
