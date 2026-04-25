@@ -13,7 +13,8 @@ class GeoSplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.geo_activity_splash)
 
-        findViewById<TextView>(R.id.tvSplashTitle).text = UiLanguageStore.pick(this, "Наследство+", "Heritage Hunt")
+        findViewById<TextView>(R.id.tvSplashTitle).text =
+            UiLanguageStore.pick(this, "Наследство+", "Heritage Hunt")
         findViewById<TextView>(R.id.tvSplashSubtitle).text =
             UiLanguageStore.pick(this, "Игра за откриване на културни места", "Explore Bulgaria through play")
         findViewById<TextView>(R.id.tvSplashLoading).text =
