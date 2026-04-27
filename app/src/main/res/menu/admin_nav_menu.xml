@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@android:drawable/ic_menu_compass"
+            android:title="Dashboard" />
+        <item
+            android:id="@+id/nav_add_geo"
+            android:icon="@android:drawable/ic_input_add"
+            android:title="Add Geolocation" />
+        <item
+            android:id="@+id/nav_manage_geo"
+            android:icon="@android:drawable/ic_menu_mapmode"
+            android:title="Manage Geolocations" />
+        <item
+            android:id="@+id/nav_players"
+            android:icon="@android:drawable/ic_menu_myplaces"
+            android:title="View Players" />
+    </group>
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@android:drawable/ic_lock_power_off"
+        android:title="Logout" />
+</menu>
