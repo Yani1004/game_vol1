@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_surface_gradient"
+    android:background="#0A0F1E"
     android:orientation="vertical">
 
     <ScrollView
@@ -15,292 +15,372 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvTeamsSection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Teams"
-                android:textColor="#8FB4FF"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvTeamName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="No team yet"
-                android:textColor="#FFFFFF"
-                android:textSize="30sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvTeamMeta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Create a team or join one with an invite code."
-                android:textColor="#B8C7E0"
-                android:textSize="15sp" />
-
+            <!-- Хедър -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:background="@drawable/bg_glass_card"
+                android:background="#111827"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="24dp"
+                android:paddingTop="32dp">
 
                 <TextView
-                    android:id="@+id/tvCreateTeamLabel"
+                    android:id="@+id/tvTeamsSection"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Create Team"
-                    android:textColor="#22314D"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:text="🛡️ Отбори"
+                    android:textColor="#A78BFA"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1" />
 
-                <EditText
-                    android:id="@+id/etTeamName"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="12dp"
-                    android:background="#E8EDF6"
-                    android:hint="Team name"
-                    android:paddingStart="15dp"
-                    android:textColor="#08111E"
-                    android:textColorHint="#64748B" />
-
-                <EditText
-                    android:id="@+id/etTeamDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:layout_marginTop="12dp"
-                    android:background="#E8EDF6"
-                    android:gravity="top"
-                    android:hint="Team description"
-                    android:padding="15dp"
-                    android:textColor="#08111E"
-                    android:textColorHint="#64748B" />
-
-                <EditText
-                    android:id="@+id/etMaxMembers"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="12dp"
-                    android:background="#E8EDF6"
-                    android:hint="Max members"
-                    android:inputType="number"
-                    android:paddingStart="15dp"
-                    android:textColor="#08111E"
-                    android:textColorHint="#64748B" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchOpenTeam"
+                <TextView
+                    android:id="@+id/tvTeamName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Open team (otherwise owner approval is required)"
-                    android:textColor="#22314D" />
-
-                <Button
-                    android:id="@+id/btnCreateTeam"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_accent_button"
-                    android:text="Create Team"
-                    android:textAllCaps="false"
+                    android:layout_marginTop="6dp"
+                    android:text="Няма отбор"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_dark_card"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/tvJoinTeamLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Join Team"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/etInviteCode"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="12dp"
-                    android:background="#24364E"
-                    android:hint="Invite code"
-                    android:paddingStart="15dp"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#94A3B8" />
-
-                <Button
-                    android:id="@+id/btnJoinTeam"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_secondary_button"
-                    android:text="Join Team"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_glass_card"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/tvInviteCodeLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Invite Code"
-                    android:textColor="#22314D"
-                    android:textSize="14sp"
+                    android:textSize="30sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvInviteCodeValue"
+                    android:id="@+id/tvTeamMeta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="-"
-                    android:textColor="#08111E"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvOwnerHint"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Only team owners can invite friends."
-                    android:textColor="#334155"
-                    android:textSize="14sp" />
-
-                <Button
-                    android:id="@+id/btnApproveNext"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_secondary_button"
-                    android:text="Approve Next Request"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF" />
-
-                <Button
-                    android:id="@+id/btnLeaveTeam"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_secondary_button"
-                    android:text="Leave Team"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_dark_card"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/tvMembersLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Members"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvTeamMembers"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Members will appear here."
-                    android:textColor="#D7DFEC"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/tvPendingRequests"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="No pending requests."
-                    android:textColor="#9FB6D8"
+                    android:layout_marginTop="6dp"
+                    android:text="Създай отбор или се присъедини с покана."
+                    android:textColor="#64748B"
                     android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <TextView
-                    android:id="@+id/tvLeaderboardLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Team Leaderboard"
-                    android:textColor="#22314D"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvLeaderboard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Leaderboard appears after your team starts earning points."
-                    android:textColor="#08111E"
-                    android:textSize="15sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_dark_card"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/tvAvailableTeamsLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Available Teams"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
+                <!-- Създай отбор -->
                 <LinearLayout
-                    android:id="@+id/availableTeamsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="vertical" />
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚔️"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/tvCreateTeamLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Създай отбор"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/etTeamName"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_input_field"
+                        android:hint="Име на отбора"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#475569"
+                        android:textSize="15sp" />
+
+                    <EditText
+                        android:id="@+id/etTeamDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_input_field"
+                        android:gravity="top"
+                        android:hint="Описание на отбора"
+                        android:padding="18dp"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#475569"
+                        android:textSize="15sp" />
+
+                    <EditText
+                        android:id="@+id/etMaxMembers"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_input_field"
+                        android:hint="Максимален брой членове"
+                        android:inputType="number"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#475569"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchOpenTeam"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="Отворен отбор (без одобрение)"
+                        android:textColor="#94A3B8"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btnCreateTeam"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_accent_button"
+                        android:text="Създай отбор"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Присъедини се -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_dark_card"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔑"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/tvJoinTeamLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Присъедини се към отбор"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/etInviteCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_input_field"
+                        android:hint="Код за покана"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#475569"
+                        android:textSize="15sp" />
+
+                    <Button
+                        android:id="@+id/btnJoinTeam"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_secondary_button"
+                        android:text="Присъедини се"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Покана -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📨"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/tvInviteCodeLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Код за покана"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvInviteCodeValue"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="-"
+                        android:textColor="#A78BFA"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.15" />
+
+                    <TextView
+                        android:id="@+id/tvOwnerHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Само собственикът на отбора може да кани приятели."
+                        android:textColor="#64748B"
+                        android:textSize="13sp" />
+
+                    <Button
+                        android:id="@+id/btnApproveNext"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_secondary_button"
+                        android:text="✅ Одобри заявка"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btnLeaveTeam"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_input_field"
+                        android:text="🚪 Напусни отбора"
+                        android:textAllCaps="false"
+                        android:textColor="#EF4444"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Членове -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_dark_card"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="👥"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/tvMembersLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Членове"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvTeamMembers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Членовете ще се появят тук."
+                        android:textColor="#94A3B8"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/tvPendingRequests"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Няма чакащи заявки."
+                        android:textColor="#64748B"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Класация -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🏆"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/tvLeaderboardLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Класация на отбора"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvLeaderboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Класацията се появява след като отборът започне да събира точки."
+                        android:textColor="#64748B"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <!-- Налични отбори -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_dark_card"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🌍"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/tvAvailableTeamsLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Налични отбори"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/availableTeamsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical" />
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

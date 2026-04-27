@@ -6,7 +6,9 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -35,6 +37,10 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var btnDiscover: Button
     private lateinit var btnCamera: Button
     private lateinit var btnDaily: Button
+    private lateinit var btnCameraEmpty: Button
+    private lateinit var btnDailyEmpty: Button
+    private lateinit var bottomPlaceCard: LinearLayout
+    private lateinit var noPlaceButtons: LinearLayout
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var googleMap: GoogleMap? = null
@@ -57,12 +63,18 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         btnDiscover = findViewById(R.id.btnDiscoverPlace)
         btnCamera = findViewById(R.id.btnOpenCamera)
         btnDaily = findViewById(R.id.btnOpenDaily)
+        btnCameraEmpty = findViewById(R.id.btnOpenCameraEmpty)
+        btnDailyEmpty = findViewById(R.id.btnOpenDailyEmpty)
+        bottomPlaceCard = findViewById(R.id.bottomPlaceCard)
+        noPlaceButtons = findViewById(R.id.noPlaceButtons)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         btnDiscover.setOnClickListener { discoverSelectedPlace() }
         btnCamera.setOnClickListener { openCamera() }
         btnDaily.setOnClickListener { startActivity(Intent(this, GoalsActivity::class.java)) }
+        btnCameraEmpty.setOnClickListener { openCamera() }
+        btnDailyEmpty.setOnClickListener { startActivity(Intent(this, GoalsActivity::class.java)) }
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -76,11 +88,15 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         applyLanguage()
         updateHeader()
         renderSelectedPlace()
+        requestLocationAndRefresh()
     }
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         map.uiSettings.isMapToolbarEnabled = false
+        map.uiSettings.isZoomControlsEnabled = true
+        map.uiSettings.isZoomGesturesEnabled = true
+        map.uiSettings.isScrollGesturesEnabled = true
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(42.7339, 25.4858), 6.2f))
         map.setOnMarkerClickListener { marker ->
             val place = markerPlaceMap[marker] ?: return@setOnMarkerClickListener false
@@ -101,22 +117,19 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     .position(LatLng(place.latitude, place.longitude))
                     .title(place.title),
             )
-            if (marker != null) {
-                markerPlaceMap[marker] = place
-            }
+            if (marker != null) markerPlaceMap[marker] = place
         }
     }
 
     private fun requestLocationAndRefresh() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-            PackageManager.PERMISSION_GRANTED
-        ) {
+            PackageManager.PERMISSION_GRANTED) {
             googleMap?.isMyLocationEnabled = true
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
                     currentLocation = location
                     googleMap?.animateCamera(
-                        CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 11.5f),
+                        CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 11.5f)
                     )
                     updateHeader()
                     renderSelectedPlace()
@@ -145,15 +158,13 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun renderSelectedPlace() {
         val place = selectedPlace
         if (place == null) {
-            tvSelectedPlace.text = UiLanguageStore.pick(this, "Избери обект от картата", "Select a place marker")
-            tvDistance.text = UiLanguageStore.pick(this, "Докосни маркер, за да видиш разстоянието.", "Choose a landmark on the map to see your distance.")
-            tvPlaceInfo.text = UiLanguageStore.pick(
-                this,
-                "Отиди до мястото, приближи се на ${GameRepository.discoveryRadiusMeters().toInt()} метра и натисни Открий, за да го запазиш в историята си.",
-                "Walk to a place, get within ${GameRepository.discoveryRadiusMeters().toInt()} meters, then tap Discover to save it into your history.",
-            )
+            bottomPlaceCard.visibility = View.GONE
+            noPlaceButtons.visibility = View.VISIBLE
             return
         }
+
+        bottomPlaceCard.visibility = View.VISIBLE
+        noPlaceButtons.visibility = View.GONE
 
         tvSelectedPlace.text = "${place.title} | ${place.city}"
         tvPlaceInfo.text = "${place.shortDescription}\n\n${place.historicalInfo}"
@@ -165,12 +176,11 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         val distance = GameRepository.distanceMeters(current.latitude, current.longitude, place)
-        tvDistance.text =
-            if (UiLanguageStore.isBulgarian(this)) {
-                "Разстояние: ${distance.toInt()} м | ${if (GameRepository.canDiscover(distance)) "Можеш да откриеш това място." else "Приближи се, за да го отключиш."}"
-            } else {
-                "Distance: ${distance.toInt()} m | ${if (GameRepository.canDiscover(distance)) "You can discover this place now." else "Move closer to unlock it."}"
-            }
+        tvDistance.text = if (UiLanguageStore.isBulgarian(this)) {
+            "Разстояние: ${distance.toInt()} м | ${if (GameRepository.canDiscover(distance)) "✅ Можеш да откриеш!" else "🚶 Приближи се"}"
+        } else {
+            "Distance: ${distance.toInt()} m | ${if (GameRepository.canDiscover(distance)) "✅ You can discover!" else "🚶 Move closer"}"
+        }
     }
 
     private fun discoverSelectedPlace() {
@@ -190,9 +200,9 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
             Toast.makeText(
                 this,
                 if (UiLanguageStore.isBulgarian(this)) {
-                    "Намираш се на ${result.distanceMeters.toInt()} метра. Приближи се в радиус от ${GameRepository.discoveryRadiusMeters().toInt()} метра."
+                    "Намираш се на ${result.distanceMeters.toInt()} м. Приближи се в радиус от ${GameRepository.discoveryRadiusMeters().toInt()} м."
                 } else {
-                    "You are ${result.distanceMeters.toInt()} meters away. Move within ${GameRepository.discoveryRadiusMeters().toInt()} meters."
+                    "You are ${result.distanceMeters.toInt()} m away. Move within ${GameRepository.discoveryRadiusMeters().toInt()} meters."
                 },
                 Toast.LENGTH_LONG,
             ).show()
@@ -203,17 +213,17 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         renderSelectedPlace()
 
         AlertDialog.Builder(this)
-            .setTitle(UiLanguageStore.pick(this, "Мястото е открито", "Place discovered"))
+            .setTitle(UiLanguageStore.pick(this, "🎉 Мястото е открито!", "🎉 Place discovered!"))
             .setMessage(
                 if (UiLanguageStore.isBulgarian(this)) {
-                    "${place.title}\n\n${place.historicalInfo}\n\nСпечелени точки: ${result.pointsAwarded}" +
-                        if (result.dailyBonusAwarded) "\nПолучен е бонус от дневното предизвикателство." else ""
+                    "${place.title}\n\n${place.historicalInfo}\n\n⭐ Спечелени точки: ${result.pointsAwarded}" +
+                            if (result.dailyBonusAwarded) "\n🎁 Получен е бонус от дневното предизвикателство!" else ""
                 } else {
-                    "${place.title}\n\n${place.historicalInfo}\n\nPoints earned: ${result.pointsAwarded}" +
-                        if (result.dailyBonusAwarded) "\nDaily challenge bonus unlocked." else ""
+                    "${place.title}\n\n${place.historicalInfo}\n\n⭐ Points earned: ${result.pointsAwarded}" +
+                            if (result.dailyBonusAwarded) "\n🎁 Daily challenge bonus unlocked!" else ""
                 },
             )
-            .setPositiveButton(UiLanguageStore.pick(this, "Супер", "Great")) { _, _ -> }
+            .setPositiveButton(UiLanguageStore.pick(this, "Супер! 🚀", "Awesome! 🚀")) { _, _ -> }
             .show()
     }
 
@@ -222,15 +232,11 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         if (intent.resolveActivity(packageManager) != null) {
             cameraLauncher.launch(intent)
         } else {
-            Toast.makeText(this, UiLanguageStore.pick(this, "Не е намерено приложение за камера на това устройство.", "No camera app found on this device."), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, UiLanguageStore.pick(this, "Не е намерено приложение за камера.", "No camera app found."), Toast.LENGTH_SHORT).show()
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 11 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             requestLocationAndRefresh()
@@ -242,6 +248,8 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         btnDiscover.text = UiLanguageStore.pick(this, "Открий това място", "Discover This Place")
         btnCamera.text = UiLanguageStore.pick(this, "Камера", "Camera")
         btnDaily.text = UiLanguageStore.pick(this, "Днешна задача", "Today's Task")
+        btnCameraEmpty.text = UiLanguageStore.pick(this, "Камера", "Camera")
+        btnDailyEmpty.text = UiLanguageStore.pick(this, "Днешна задача", "Today's Task")
         AppNavigation.bind(this, findViewById<BottomNavigationView>(R.id.bottomNav), R.id.nav_explore)
     }
 }
