@@ -2,4 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Admin panel palette -->
+    <color name="admin_primary">#2E7D32</color>
+    <color name="admin_primary_dark">#1B5E20</color>
+    <color name="admin_blue">#1565C0</color>
+    <color name="admin_blue_light">#42A5F5</color>
+    <color name="admin_dark_gray">#37474F</color>
+    <color name="admin_gray">#757575</color>
+    <color name="admin_bg">#F4F6F8</color>
+    <color name="admin_green">#388E3C</color>
+    <color name="admin_red">#D32F2F</color>
+    <color name="admin_orange">#E65100</color>
+    <color name="chip_bg">#F5F5F5</color>
 </resources>

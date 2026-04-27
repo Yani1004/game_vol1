@@ -1,12 +1,14 @@
 package com.example.game_vol1
 
 import android.content.Intent
+import android.graphics.Paint
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.game_vol1.admin.AdminLoginActivity
 import com.example.game_vol1.data.GameRepository
 
 class GeoLoginActivity : AppCompatActivity() {
@@ -79,6 +81,12 @@ class GeoLoginActivity : AppCompatActivity() {
         languageButton.setOnClickListener {
             UiLanguageStore.toggle(this)
             applyLanguage()
+        }
+
+        val tvAdmin = findViewById<TextView>(R.id.tvAdminAccess)
+        tvAdmin.paintFlags = tvAdmin.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        tvAdmin.setOnClickListener {
+            startActivity(Intent(this, AdminLoginActivity::class.java))
         }
     }
 }

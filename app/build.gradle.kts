@@ -1,5 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
+
+}
+
+// Source - https://stackoverflow.com/a/78135333
+// Posted by quynhbkhn
+// Retrieved 2026-04-27, License - CC BY-SA 4.0
+
+plugins {
+
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -46,6 +57,9 @@ dependencies {
     implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

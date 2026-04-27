@@ -10,6 +10,7 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -19,40 +20,37 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Game_vol1">
+
         <receiver
             android:name=".DailyReminderReceiver"
             android:enabled="true"
             android:exported="false" />
-        <activity
-            android:name=".TeamActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ExplorerMapActivity"
-            android:exported="false" />
-        <activity
-            android:name=".DiscoveriesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".GoalsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".GeoMenuActivity"
-            android:exported="false" />
-        <activity
-            android:name=".GeoLoginActivity"
-            android:exported="false" />
+
+        <!-- Existing game activities -->
+        <activity android:name=".TeamActivity" android:exported="false" />
+        <activity android:name=".RegisterActivity" android:exported="false" />
+        <activity android:name=".ExplorerMapActivity" android:exported="false" />
+        <activity android:name=".DiscoveriesActivity" android:exported="false" />
+        <activity android:name=".GoalsActivity" android:exported="false" />
+        <activity android:name=".GeoMenuActivity" android:exported="false" />
+        <activity android:name=".GeoLoginActivity" android:exported="false" />
         <activity
             android:name=".GeoSplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Admin panel activities -->
+        <activity android:name=".admin.AdminLoginActivity" android:exported="false" />
+        <activity android:name=".admin.AdminDashboardActivity" android:exported="false" />
+        <activity android:name=".admin.AddGeoLocationActivity" android:exported="false" />
+        <activity android:name=".admin.ManageGeoLocationsActivity" android:exported="false" />
+        <activity android:name=".admin.ViewPlayersActivity" android:exported="false" />
+        <activity android:name=".admin.PlayerDetailsActivity" android:exported="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBZvqaDJUBnUKYb6adi3tpkKSLO-o7d13Y" />

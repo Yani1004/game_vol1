@@ -149,5 +149,16 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/tvAdminAccess"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="Admin Access"
+            android:textColor="#475569"
+            android:textSize="13sp"
+            android:padding="8dp" />
+
     </LinearLayout>
 </LinearLayout>
