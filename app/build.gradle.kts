@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,7 +18,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        val mapsApiKey = (project.findProperty("MAPS_API_KEY") as? String).orEmpty()
+        val localProperties = Properties().apply {
+            val localPropertiesFile = rootProject.file("local.properties")
+            if (localPropertiesFile.exists()) {
+                localPropertiesFile.inputStream().use(::load)
+            }
+        }
+        val mapsApiKey = (project.findProperty("MAPS_API_KEY") as? String)
+            ?: localProperties.getProperty("MAPS_API_KEY")
+            ?: ""
         val adminEmail = (project.findProperty("ADMIN_EMAIL") as? String) ?: "admin@geoguesser.com"
         val adminPassword = (project.findProperty("ADMIN_PASSWORD") as? String) ?: "Admin@2024"
 
@@ -61,7 +71,7 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("com.google.ar:core:1.41.0")
     implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
-    implementation("com.google.android.gms:play-services-location:21.2.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)

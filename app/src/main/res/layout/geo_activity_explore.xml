@@ -15,39 +15,101 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <!-- Горна информационна лента -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_margin="12dp"
-            android:background="@drawable/bg_glass_card"
-            android:orientation="vertical"
-            android:padding="14dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvExploreSection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Карта"
-                android:textColor="@color/game_primary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1" />
-
-            <TextView
-                android:id="@+id/tvExplorerStatus"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Explorer status"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:background="@drawable/bg_top_pill"
+                android:elevation="3dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="10dp">
 
+                <TextView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_icon_blue"
+                    android:gravity="center"
+                    android:text="GPS"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvExploreSection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MAP SCREEN"
+                        android:textColor="@color/game_primary_dark"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvExplorerStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:singleLine="true"
+                        android:text="Explorer | Level 1 | 0 pts | Waiting for GPS"
+                        android:textColor="@color/game_text"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_level_track">
+
+                        <View
+                            android:layout_width="96dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_level_fill" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_coin_chip"
+                    android:gravity="center"
+                    android:minWidth="76dp"
+                    android:paddingHorizontal="10dp"
+                    android:text="2,450"
+                    android:textColor="@color/game_text"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_top_pill"
+                android:elevation="3dp"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:text="1  Explore monuments"
+                android:textColor="@color/game_text"
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Card за избраното място -->
         <LinearLayout
             android:id="@+id/bottomPlaceCard"
             android:layout_width="match_parent"
@@ -55,8 +117,10 @@
             android:layout_gravity="bottom"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
-            android:layout_marginBottom="72dp"
-            android:background="@drawable/bg_glass_card"
+            android:layout_marginBottom="104dp"
+            android:background="@drawable/bg_card_green"
+            android:elevation="3dp"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
             android:padding="16dp"
             android:visibility="gone">
@@ -65,8 +129,9 @@
                 android:id="@+id/tvSelectedPlace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Избери обект от картата"
-                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:text="Selected monument"
+                android:textColor="@color/game_text"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -75,6 +140,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:gravity="center"
                 android:text="Distance info"
                 android:textColor="@color/game_accent"
                 android:textSize="14sp"
@@ -85,6 +151,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:maxLines="3"
                 android:text="Place info"
                 android:textColor="@color/game_text_muted"
                 android:textSize="14sp" />
@@ -95,7 +162,7 @@
                 android:layout_height="52dp"
                 android:layout_marginTop="14dp"
                 android:background="@drawable/bg_accent_button"
-                android:text="Открий това място"
+                android:text="Discover This Place"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
@@ -115,9 +182,9 @@
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_secondary_button"
-                    android:text="Камера"
+                    android:text="AR Camera"
                     android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/game_text"
                     android:textStyle="bold" />
 
                 <Button
@@ -127,14 +194,13 @@
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_secondary_button"
-                    android:text="Днешна задача"
+                    android:text="Daily Task"
                     android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/game_text"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Панел когато няма избрано място -->
         <LinearLayout
             android:id="@+id/noPlaceButtons"
             android:layout_width="match_parent"
@@ -142,8 +208,10 @@
             android:layout_gravity="bottom"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
-            android:layout_marginBottom="72dp"
-            android:background="@drawable/bg_glass_card"
+            android:layout_marginBottom="104dp"
+            android:background="@drawable/bg_card_blue"
+            android:elevation="3dp"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -152,19 +220,52 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="🗺️ Докосни маркер на картата"
-                android:textColor="@color/game_primary"
+                android:text="Nearby Monuments"
+                android:textColor="@color/game_text"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center"
-                android:text="Приближи се на 250м и открий историческото място"
+                android:layout_marginTop="4dp"
+                android:text="Tap a map marker, then get within range to earn points."
                 android:textColor="@color/game_text_muted"
                 android:textSize="13sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_card_plain"
+                android:elevation="3dp"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="National Museum                                      120 m"
+                    android:textColor="@color/game_text"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Old Tower                                                250 m"
+                    android:textColor="@color/game_text"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="City Hall                                                  480 m"
+                    android:textColor="@color/game_text"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -180,9 +281,9 @@
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_secondary_button"
-                    android:text="Камера"
+                    android:text="AR Camera"
                     android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/game_text"
                     android:textStyle="bold" />
 
                 <Button
@@ -192,9 +293,9 @@
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_secondary_button"
-                    android:text="Днешна задача"
+                    android:text="Daily Task"
                     android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/game_text"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
@@ -206,7 +307,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/game_surface"
+        android:background="@drawable/bg_bottom_nav_game"
+        android:elevation="8dp"
         app:itemIconTint="@color/bottom_nav_item"
         app:itemRippleColor="@color/game_surface_high"
         app:itemTextColor="@color/bottom_nav_item"

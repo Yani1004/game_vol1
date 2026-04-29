@@ -25,7 +25,7 @@ object GameRepository {
     private const val KEY_TEAM_DIRECTORY = "team_directory"
     private const val KEY_CURRENT_TEAM_CODE = "current_team_code"
 
-    private const val DISCOVERY_RADIUS_METERS = 250f
+    private const val DISCOVERY_RADIUS_METERS = 30f
     private const val DAILY_BONUS_POINTS = 150
 
     fun getPlaces(): List<HeritagePlace> = listOf(
@@ -95,10 +95,36 @@ object GameRepository {
             "The formations stretch across a large area and are tied to local legends and medieval defense history.",
             "Natural Landmark",
         ),
+        HeritagePlace(
+            "demo_discovery_point",
+            "Demo Discovery Point",
+            "Bansko",
+            "Bulgaria",
+            41.88460040487995,
+            23.461743142766196,
+            "Temporary demo location added for the project presentation.",
+            "This point is available as a nearby place to discover during the demo.",
+            "Demo Location",
+        ),
     )
 
     fun hasRegisteredAccount(context: Context): Boolean =
         prefs(context).getString(KEY_EMAIL, null) != null
+
+    fun saveSessionFromCloud(
+        context: Context,
+        username: String,
+        email: String,
+        totalScore: Int = 0,
+    ) {
+        prefs(context).edit()
+            .putString(KEY_NAME, username.trim().ifBlank { "Explorer" })
+            .putString(KEY_EMAIL, email.trim().lowercase())
+            .putString(KEY_PASSWORD, "")
+            .putString(KEY_ACTIVE_EMAIL, email.trim().lowercase())
+            .putInt(KEY_TOTAL_SCORE, totalScore)
+            .apply()
+    }
 
     fun register(context: Context, name: String, email: String, password: String): Boolean {
         if (hasRegisteredAccount(context)) return false
@@ -126,10 +152,12 @@ object GameRepository {
 
     fun logout(context: Context) {
         prefs(context).edit().remove(KEY_ACTIVE_EMAIL).apply()
+        MultiplayerRepository.logout(context)
     }
 
     fun isLoggedIn(context: Context): Boolean =
-        prefs(context).getString(KEY_ACTIVE_EMAIL, null) != null
+        prefs(context).getString(KEY_ACTIVE_EMAIL, null) != null ||
+            MultiplayerRepository.currentUserId(context) != null
 
     fun loadProfile(context: Context): PlayerProfile {
         val visits = loadVisits(context)
@@ -147,6 +175,18 @@ object GameRepository {
         ensureTeamDirectory(context)
         val currentCode = prefs(context).getString(KEY_CURRENT_TEAM_CODE, "") ?: ""
         return loadAllTeams(context).firstOrNull { it.inviteCode == currentCode } ?: TeamInfo()
+    }
+
+    fun saveTeamFromCloud(context: Context, team: TeamInfo) {
+        ensureTeamDirectory(context)
+        val teams = loadAllTeams(context)
+        val updatedTeams = if (teams.any { it.inviteCode == team.inviteCode }) {
+            teams.map { if (it.inviteCode == team.inviteCode) team else it }
+        } else {
+            teams + team
+        }
+        saveAllTeams(context, updatedTeams)
+        prefs(context).edit().putString(KEY_CURRENT_TEAM_CODE, team.inviteCode).apply()
     }
 
     fun createTeam(
@@ -176,7 +216,7 @@ object GameRepository {
 
         saveAllTeams(context, loadAllTeams(context) + newTeam)
         prefs(context).edit().putString(KEY_CURRENT_TEAM_CODE, code).apply()
-        return loadTeam(context)
+        return loadTeam(context).also { MultiplayerRepository.syncTeam(context, it) }
     }
 
     fun joinTeamByCode(context: Context, inviteCode: String): JoinTeamResult {
@@ -197,6 +237,7 @@ object GameRepository {
             )
             saveAllTeams(context, teams.map { if (it.inviteCode == target.inviteCode) updatedTarget else it })
             prefs(context).edit().putString(KEY_CURRENT_TEAM_CODE, updatedTarget.inviteCode).apply()
+            MultiplayerRepository.syncTeam(context, updatedTarget)
             return JoinTeamResult.Joined(updatedTarget)
         }
 
@@ -247,6 +288,7 @@ object GameRepository {
         )
         saveAllTeams(context, loadAllTeams(context).map { if (it.inviteCode == current.inviteCode) updated else it })
         prefs(context).edit().remove(KEY_CURRENT_TEAM_CODE).apply()
+        MultiplayerRepository.syncTeam(context, updated)
         return updated
     }
 
@@ -263,6 +305,7 @@ object GameRepository {
             memberScores = team.memberScores + (requesterName to 0),
         )
         saveAllTeams(context, loadAllTeams(context).map { if (it.inviteCode == team.inviteCode) updatedTeam else it })
+        MultiplayerRepository.syncTeam(context, updatedTeam)
         return updatedTeam
     }
 
@@ -353,6 +396,7 @@ object GameRepository {
             saveAllTeams(context, loadAllTeams(context).map { if (it.inviteCode == team.inviteCode) updatedTeam else it })
         }
 
+        MultiplayerRepository.recordDiscovery(context, place, awardedPoints, distance, dailyBonusAwarded)
         return DiscoveryOutcome(true, distance, awardedPoints, dailyBonusAwarded)
     }
 

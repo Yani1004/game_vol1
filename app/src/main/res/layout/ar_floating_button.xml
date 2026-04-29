@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="200dp"
     android:layout_height="wrap_content"
-    android:background="@android:drawable/dialog_holo_dark_frame"
+    android:background="@drawable/bg_glass_card"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="20dp">
@@ -11,27 +11,27 @@
         android:id="@+id/tvArtifactIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="🏺"
-        android:textSize="50sp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:text="🏛️"
+        android:textSize="50sp" />
 
     <TextView
         android:id="@+id/tvArtifactName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Тракийска Амфора"
-        android:textColor="#FFD700"
+        android:text="Тракийска амфора"
+        android:textAlignment="center"
+        android:textColor="@color/game_accent"
         android:textSize="18sp"
-        android:textStyle="bold"
-        android:textAlignment="center"/>
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Докосни, за да вземеш!"
-        android:textColor="#FFFFFF"
-        android:textSize="14sp"
         android:layout_marginTop="10dp"
-        android:textAlignment="center"/>
+        android:text="Докосни, за да вземеш!"
+        android:textAlignment="center"
+        android:textColor="@color/game_text"
+        android:textSize="14sp" />
 
 </LinearLayout>
