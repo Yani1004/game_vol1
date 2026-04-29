@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0F1E"
+    android:background="@drawable/bg_app_gradient"
     android:orientation="vertical">
 
     <ScrollView
@@ -21,7 +21,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#111827"
+                android:background="@drawable/bg_header_gradient"
                 android:orientation="vertical"
                 android:padding="24dp"
                 android:paddingTop="32dp">
@@ -31,7 +31,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="📜 История"
-                    android:textColor="#A78BFA"
+                    android:textColor="@color/game_primary"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.1" />
@@ -66,7 +66,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🗺️ Статистики на пътешествието"
-                        android:textColor="#A78BFA"
+                        android:textColor="@color/game_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.1" />
@@ -87,7 +87,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="Всяко открито място пази времето на посещението и историята си."
-                        android:textColor="#64748B"
+                        android:textColor="@color/game_text_muted"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -102,7 +102,7 @@
                     android:lineSpacingExtra="8dp"
                     android:padding="32dp"
                     android:text="🏛️ Все още няма открити забележителности.\n\nОтиди на картата и открий първото си място!"
-                    android:textColor="#94A3B8"
+                    android:textColor="@color/game_text_muted"
                     android:textSize="15sp"
                     android:visibility="visible" />
 
@@ -116,7 +116,7 @@
                     android:background="@drawable/bg_dark_card"
                     android:lineSpacingExtra="8dp"
                     android:padding="20dp"
-                    android:textColor="#E2E8F0"
+                    android:textColor="@color/game_text"
                     android:textSize="15sp"
                     android:visibility="gone" />
 
@@ -128,9 +128,10 @@
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#101B2D"
-        app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white"
+        android:background="@color/game_surface"
+        app:itemIconTint="@color/bottom_nav_item"
+        app:itemRippleColor="@color/game_surface_high"
+        app:itemTextColor="@color/bottom_nav_item"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

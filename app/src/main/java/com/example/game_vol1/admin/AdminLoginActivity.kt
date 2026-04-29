@@ -33,6 +33,7 @@ class AdminLoginActivity : AppCompatActivity() {
         val etEmail = findViewById<TextInputEditText>(R.id.etAdminEmail)
         val etPassword = findViewById<TextInputEditText>(R.id.etAdminPassword)
         val btnLogin = findViewById<MaterialButton>(R.id.btnAdminLogin)
+        val btnBack = findViewById<MaterialButton>(R.id.btnBackAccessible)
 
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -50,6 +51,8 @@ class AdminLoginActivity : AppCompatActivity() {
                 tilPassword.error = "Wrong email or password"
             }
         }
+
+        btnBack.setOnClickListener { finish() }
     }
 
     private fun goToDashboard() {

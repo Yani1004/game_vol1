@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0F1E"
+    android:background="@drawable/bg_app_gradient"
     android:orientation="vertical">
 
     <!-- Горна декорация -->
@@ -28,10 +28,10 @@
                 android:id="@+id/btnLanguageToggle"
                 android:layout_width="72dp"
                 android:layout_height="40dp"
-                android:backgroundTint="#1E293B"
+                android:background="@drawable/bg_language_button"
                 android:text="БГ"
                 android:textAllCaps="false"
-                android:textColor="#A78BFA"
+                android:textColor="@color/game_primary"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -66,7 +66,7 @@
                 android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:text="Открий България около теб"
-                android:textColor="#A78BFA"
+                android:textColor="@color/game_text_muted"
                 android:textSize="15sp" />
         </LinearLayout>
     </FrameLayout>
@@ -76,7 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.6"
-        android:background="#111827"
+        android:background="@drawable/bg_header_gradient"
         android:orientation="vertical"
         android:padding="28dp"
         android:paddingTop="32dp">
@@ -95,7 +95,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="24dp"
             android:text="Влез в профила си"
-            android:textColor="#64748B"
+            android:textColor="@color/game_text_muted"
             android:textSize="14sp" />
 
         <EditText
@@ -109,7 +109,7 @@
             android:paddingStart="18dp"
             android:paddingEnd="18dp"
             android:textColor="#FFFFFF"
-            android:textColorHint="#475569"
+            android:textColorHint="@color/game_text_dim"
             android:textSize="15sp" />
 
         <EditText
@@ -123,7 +123,7 @@
             android:paddingStart="18dp"
             android:paddingEnd="18dp"
             android:textColor="#FFFFFF"
-            android:textColorHint="#475569"
+            android:textColorHint="@color/game_text_dim"
             android:textSize="15sp" />
 
         <Button
@@ -156,7 +156,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:text="Admin Access"
-            android:textColor="#475569"
+            android:textColor="@color/game_text_dim"
             android:textSize="13sp"
             android:padding="8dp" />
 

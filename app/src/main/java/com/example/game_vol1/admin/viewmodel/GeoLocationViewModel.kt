@@ -32,6 +32,7 @@ class GeoLocationViewModel(app: Application) : AndroidViewModel(app) {
         .asLiveData()
 
     val operationResult = MutableLiveData<String>()
+    val operationError = MutableLiveData<String>()
 
     fun search(query: String) {
         _searchQuery.value = query
@@ -45,16 +46,19 @@ class GeoLocationViewModel(app: Application) : AndroidViewModel(app) {
 
     fun add(geo: GeoLocationEntity) = viewModelScope.launch {
         repo.addGeoLocation(geo)
-        operationResult.postValue("Location added successfully!")
+            .onSuccess { operationResult.postValue("Location added successfully!") }
+            .onFailure { operationError.postValue(it.message ?: "Failed to add location.") }
     }
 
     fun update(geo: GeoLocationEntity) = viewModelScope.launch {
         repo.updateGeoLocation(geo)
-        operationResult.postValue("Location updated!")
+            .onSuccess { operationResult.postValue("Location updated!") }
+            .onFailure { operationError.postValue(it.message ?: "Failed to update location.") }
     }
 
     fun delete(geo: GeoLocationEntity) = viewModelScope.launch {
         repo.deleteGeoLocation(geo)
-        operationResult.postValue("Location deleted.")
+            .onSuccess { operationResult.postValue("Location deleted.") }
+            .onFailure { operationError.postValue(it.message ?: "Failed to delete location.") }
     }
 }

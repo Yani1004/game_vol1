@@ -22,6 +22,8 @@ class RegisterActivity : AppCompatActivity() {
         val backButton = findViewById<Button>(R.id.btnBackToLogin)
         val languageButton = findViewById<Button>(R.id.btnLanguageToggle)
         val titleView = findViewById<TextView>(R.id.tvRegisterTitle)
+        listOf(createButton, backButton, languageButton).forEach { it.applyPressFeedback() }
+        findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
 
         fun applyLanguage() {
             val isBulgarian = UiLanguageStore.isBulgarian(this)
@@ -30,8 +32,8 @@ class RegisterActivity : AppCompatActivity() {
             emailInput.hint = if (isBulgarian) "Имейл" else "Email"
             passwordInput.hint = if (isBulgarian) "Парола" else "Password"
             confirmInput.hint = if (isBulgarian) "Потвърди парола" else "Confirm password"
-            createButton.text = if (isBulgarian) "СЪЗДАЙ ПРОФИЛ" else "CREATE ACCOUNT"
-            backButton.text = if (isBulgarian) "ОБРАТНО КЪМ ВХОД" else "BACK TO LOGIN"
+            createButton.text = if (isBulgarian) "Създай профил" else "Create Account"
+            backButton.text = if (isBulgarian) "Обратно към вход" else "Back To Login"
             languageButton.text = if (isBulgarian) "ENG" else "БГ"
         }
 

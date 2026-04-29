@@ -3,6 +3,7 @@ package com.example.game_vol1.admin
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -22,6 +23,7 @@ class PlayerDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!AdminAccessManager.enforceAdminOrRedirect(this)) return
         setContentView(R.layout.activity_player_details)
 
         val playerId = intent.getIntExtra(EXTRA_PLAYER_ID, -1)
@@ -60,14 +62,30 @@ class PlayerDetailsActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.tvDetailLastPlayed).text = lastPlayed
         }
 
-        vm.getResults(playerId).observe(this) { resultsAdapter.submitList(it) }
+        vm.getResults(playerId).observe(this) { results ->
+            resultsAdapter.submitList(results)
+
+            val correct = results.filter { it.isCorrect }
+            val incorrect = results.filterNot { it.isCorrect }
+
+            findViewById<TextView>(R.id.tvCorrectLocationsCount).text = correct.size.toString()
+            findViewById<TextView>(R.id.tvIncorrectLocationsCount).text = incorrect.size.toString()
+            findViewById<TextView>(R.id.tvCorrectLocationsList).text =
+                if (correct.isEmpty()) "No correct guesses yet." else correct.take(5).joinToString("\n") { it.geoLocationName }
+            findViewById<TextView>(R.id.tvIncorrectLocationsList).text =
+                if (incorrect.isEmpty()) "No incorrect guesses yet." else incorrect.take(5).joinToString("\n") { it.geoLocationName }
+        }
 
         vm.averageScore.observe(this) { avg ->
             val text = if (avg != null) "%.0f pts".format(avg) else "N/A"
             findViewById<TextView>(R.id.tvDetailAvgScore).text = text
         }
+        vm.operationError.observe(this) { Toast.makeText(this, it, Toast.LENGTH_LONG).show() }
 
         vm.loadAverage(playerId)
+
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btnBackAccessible)
+            .setOnClickListener { finish() }
     }
 
     private fun rank(score: Int) = when {

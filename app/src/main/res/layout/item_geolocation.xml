@@ -77,7 +77,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_edit"
             android:contentDescription="Edit"
-            android:tint="@color/admin_blue" />
+            app:tint="@color/admin_blue" />
 
         <ImageButton
             android:id="@+id/btnDeleteGeo"
@@ -86,7 +86,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_delete"
             android:contentDescription="Delete"
-            android:tint="@color/admin_red"
+            app:tint="@color/admin_red"
             android:layout_marginStart="4dp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

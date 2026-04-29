@@ -15,6 +15,7 @@ class GoalsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.geo_activity_goals)
+        findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
 
         renderScreen()
     }

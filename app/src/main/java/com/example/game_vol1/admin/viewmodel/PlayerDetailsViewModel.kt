@@ -13,11 +13,14 @@ class PlayerDetailsViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = AdminRepository(AppDatabase.getInstance(app))
 
     val averageScore = MutableLiveData<Double?>()
+    val operationError = MutableLiveData<String>()
 
     fun getPlayer(id: Int) = repo.getPlayerById(id).asLiveData()
     fun getResults(playerId: Int) = repo.getResultsForPlayer(playerId).asLiveData()
 
     fun loadAverage(playerId: Int) = viewModelScope.launch {
-        averageScore.postValue(repo.getAverageScore(playerId))
+        repo.getAverageScore(playerId)
+            .onSuccess { averageScore.postValue(it) }
+            .onFailure { operationError.postValue(it.message ?: "Failed to load average score.") }
     }
 }

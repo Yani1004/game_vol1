@@ -8,6 +8,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.game_vol1.admin.AdminAccessManager
+import com.example.game_vol1.admin.AdminDashboardActivity
 import com.example.game_vol1.admin.AdminLoginActivity
 import com.example.game_vol1.data.GameRepository
 
@@ -23,6 +25,8 @@ class GeoLoginActivity : AppCompatActivity() {
         val languageButton = findViewById<Button>(R.id.btnLanguageToggle)
         val titleView = findViewById<TextView>(R.id.tvLoginTitle)
         val subtitleView = findViewById<TextView>(R.id.tvLoginSubtitle)
+        listOf(loginButton, registerButton, languageButton).forEach { it.applyPressFeedback() }
+        findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
 
         fun applyLanguage() {
             val isBulgarian = UiLanguageStore.isBulgarian(this)
@@ -34,8 +38,8 @@ class GeoLoginActivity : AppCompatActivity() {
             }
             emailInput.hint = if (isBulgarian) "Имейл" else "Email"
             passwordInput.hint = if (isBulgarian) "Парола" else "Password"
-            loginButton.text = if (isBulgarian) "ВХОД" else "LOGIN"
-            registerButton.text = if (isBulgarian) "РЕГИСТРАЦИЯ" else "REGISTER"
+            loginButton.text = if (isBulgarian) "Вход" else "Log In"
+            registerButton.text = if (isBulgarian) "Регистрация" else "Register"
             languageButton.text = if (isBulgarian) "ENG" else "БГ"
         }
 
@@ -46,15 +50,40 @@ class GeoLoginActivity : AppCompatActivity() {
 
         applyLanguage()
 
+        if (intent.getBooleanExtra("access_denied", false)) {
+            val message = if (UiLanguageStore.isBulgarian(this)) {
+                "Достъпът до админ панела е отказан."
+            } else {
+                "Access denied for the admin panel."
+            }
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
+
         loginButton.setOnClickListener {
             val email = emailInput.text.toString().trim()
             val password = passwordInput.text.toString()
             if (email.isBlank() || password.isBlank()) {
-                Toast.makeText(
-                    this,
-                    if (UiLanguageStore.isBulgarian(this)) "Въведи имейл и парола." else "Enter both email and password.",
-                    Toast.LENGTH_SHORT,
-                ).show()
+                val message = if (UiLanguageStore.isBulgarian(this)) {
+                    "Въведи имейл и парола."
+                } else {
+                    "Enter both email and password."
+                }
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (email.equals(AdminAccessManager.ADMIN_EMAIL, ignoreCase = true)) {
+                if (AdminAccessManager.login(this, email, password)) {
+                    startActivity(Intent(this, AdminDashboardActivity::class.java))
+                    finish()
+                } else {
+                    val message = if (UiLanguageStore.isBulgarian(this)) {
+                        "Невалидни админ данни."
+                    } else {
+                        "Invalid admin credentials."
+                    }
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                }
                 return@setOnClickListener
             }
 
@@ -62,15 +91,12 @@ class GeoLoginActivity : AppCompatActivity() {
                 startActivity(Intent(this, GeoMenuActivity::class.java))
                 finish()
             } else {
-                Toast.makeText(
-                    this,
-                    if (UiLanguageStore.isBulgarian(this)) {
-                        "Неуспешен вход. Регистрирай се първо или провери паролата си."
-                    } else {
-                        "Login failed. Register first or check your password."
-                    },
-                    Toast.LENGTH_LONG,
-                ).show()
+                val message = if (UiLanguageStore.isBulgarian(this)) {
+                    "Неуспешен вход. Регистрирай се първо или провери паролата си."
+                } else {
+                    "Login failed. Register first or check your password."
+                }
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             }
         }
 
@@ -83,9 +109,9 @@ class GeoLoginActivity : AppCompatActivity() {
             applyLanguage()
         }
 
-        val tvAdmin = findViewById<TextView>(R.id.tvAdminAccess)
-        tvAdmin.paintFlags = tvAdmin.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        tvAdmin.setOnClickListener {
+        val adminAccessLabel = findViewById<TextView>(R.id.tvAdminAccess)
+        adminAccessLabel.paintFlags = adminAccessLabel.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        adminAccessLabel.setOnClickListener {
             startActivity(Intent(this, AdminLoginActivity::class.java))
         }
     }

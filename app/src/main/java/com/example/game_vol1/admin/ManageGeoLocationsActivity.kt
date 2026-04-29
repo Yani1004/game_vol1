@@ -25,6 +25,7 @@ class ManageGeoLocationsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!AdminAccessManager.enforceAdminOrRedirect(this)) return
         setContentView(R.layout.activity_manage_geolocations)
 
         val toolbar = findViewById<Toolbar>(R.id.manageGeoToolbar)
@@ -33,30 +34,32 @@ class ManageGeoLocationsActivity : AppCompatActivity() {
         supportActionBar?.title = "Manage Geolocations"
 
         adapter = GeoLocationAdapter(onEdit = ::openEdit, onDelete = ::confirmDelete)
-        val rv = findViewById<RecyclerView>(R.id.rvGeoLocations)
-        rv.layoutManager = LinearLayoutManager(this)
-        rv.adapter = adapter
+        findViewById<RecyclerView>(R.id.rvGeoLocations).apply {
+            layoutManager = LinearLayoutManager(this@ManageGeoLocationsActivity)
+            adapter = this@ManageGeoLocationsActivity.adapter
+        }
 
         vm.geoLocations.observe(this) { adapter.submitList(it) }
         vm.operationResult.observe(this) { Toast.makeText(this, it, Toast.LENGTH_SHORT).show() }
+        vm.operationError.observe(this) { Toast.makeText(this, it, Toast.LENGTH_LONG).show() }
 
-        // Declare chipGroup first so the search listener can reference it
         val chipGroup = findViewById<ChipGroup>(R.id.chipGroupDifficulty)
-
-        // Text search — clears any active difficulty chip
         val searchView = findViewById<SearchView>(R.id.searchGeo)
+
+        // Searching resets difficulty chips.
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(q: String?) = true.also {
+            override fun onQueryTextSubmit(query: String?) = true.also {
                 chipGroup.clearCheck()
-                vm.search(q.orEmpty())
+                vm.search(query.orEmpty())
             }
-            override fun onQueryTextChange(q: String?) = true.also {
-                if (q.orEmpty().isNotBlank()) chipGroup.clearCheck()
-                vm.search(q.orEmpty())
+
+            override fun onQueryTextChange(query: String?) = true.also {
+                if (!query.isNullOrBlank()) chipGroup.clearCheck()
+                vm.search(query.orEmpty())
             }
         })
 
-        // Difficulty filter chips — use filterByDifficulty, not text search
+        // Difficulty chips drive the dedicated difficulty filter.
         chipGroup.setOnCheckedStateChangeListener { _, ids ->
             val selected = when (ids.firstOrNull()) {
                 R.id.chipEasy -> "Easy"
@@ -70,6 +73,9 @@ class ManageGeoLocationsActivity : AppCompatActivity() {
         findViewById<FloatingActionButton>(R.id.fabAddGeo).setOnClickListener {
             startActivity(Intent(this, AddGeoLocationActivity::class.java))
         }
+
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btnBackAccessible)
+            .setOnClickListener { finish() }
     }
 
     private fun openEdit(geo: GeoLocationEntity) {
@@ -96,7 +102,10 @@ class ManageGeoLocationsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) { finish(); return true }
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
         return super.onOptionsItemSelected(item)
     }
 }

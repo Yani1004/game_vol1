@@ -39,6 +39,7 @@ class AddGeoLocationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!AdminAccessManager.enforceAdminOrRedirect(this)) return
         setContentView(R.layout.activity_add_geolocation)
 
         val toolbar = findViewById<Toolbar>(R.id.addGeoToolbar)
@@ -71,6 +72,9 @@ class AddGeoLocationActivity : AppCompatActivity() {
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             if (msg.contains("added") || msg.contains("updated")) finish()
         }
+        vm.operationError.observe(this) { msg ->
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+        }
 
         findViewById<MaterialButton>(R.id.btnSaveGeo).setOnClickListener {
             if (!validate()) return@setOnClickListener
@@ -87,6 +91,8 @@ class AddGeoLocationActivity : AppCompatActivity() {
             )
             if (editId != -1) vm.update(geo) else vm.add(geo)
         }
+
+        findViewById<MaterialButton>(R.id.btnBackAccessible).setOnClickListener { finish() }
     }
 
     private fun bindViews() {

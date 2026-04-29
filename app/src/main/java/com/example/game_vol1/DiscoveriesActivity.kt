@@ -16,6 +16,7 @@ class DiscoveriesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.geo_activity_collection)
+        findViewById<View>(android.R.id.content).fadeSlideIn()
 
         renderScreen()
     }

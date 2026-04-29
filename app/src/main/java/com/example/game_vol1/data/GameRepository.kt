@@ -1,6 +1,7 @@
 package com.example.game_vol1.data
 
 import android.content.Context
+import android.location.Location
 import com.example.game_vol1.models.DailyChallenge
 import com.example.game_vol1.models.HeritagePlace
 import com.example.game_vol1.models.PlaceVisit
@@ -28,15 +29,76 @@ object GameRepository {
     private const val DAILY_BONUS_POINTS = 150
 
     fun getPlaces(): List<HeritagePlace> = listOf(
-        HeritagePlace("alexander_nevsky", "Храм-паметник Александър Невски", "София", "България", 42.6953, 23.3328, "Емблематична катедрала в центъра на София със златни кубета.", "Построена в началото на XX век, катедралата е посветена на загиналите войници в Руско-турската освободителна война от 1877-1878 г.", "Катедрала"),
-        HeritagePlace("rila_monastery", "Рилски манастир", "Рила", "България", 42.1338, 23.3405, "Планински манастир, заобиколен от гори и впечатляваща природа.", "Основан през X век от свети Иван Рилски, манастирът е един от най-важните духовни и културни центрове на България.", "Манастир"),
-        HeritagePlace("plovdiv_theatre", "Античен театър на Филипопол", "Пловдив", "България", 42.1466, 24.7510, "Добре запазен римски театър, който и днес се използва за събития.", "Театърът датира от I век и е сред най-добре съхранените антични театри на Балканите.", "Античен обект"),
-        HeritagePlace("tsarevets", "Крепост Царевец", "Велико Търново", "България", 43.0841, 25.6506, "Средновековна крепост върху хълм над старата българска столица.", "Царевец е главната крепост на Второто българско царство и остава един от най-разпознаваемите символи на средновековна България.", "Крепост"),
-        HeritagePlace("nessebar_old_town", "Старият Несебър", "Несебър", "България", 42.6598, 27.7360, "Исторически полуостров с църкви, каменни улици и морски гледки.", "Несебър съчетава тракийско, гръцко, римско и византийско наследство и е част от списъка на световното наследство на ЮНЕСКО.", "Исторически град"),
-        HeritagePlace("belogradchik_rocks", "Белоградчишки скали", "Белоградчик", "България", 43.6271, 22.6838, "Внушителни червени скални образувания до стара крепост.", "Скалните форми се простират на голяма площ и са свързани с легенди, местни имена и вековна отбранителна история.", "Природен феномен"),
+        HeritagePlace(
+            "alexander_nevsky",
+            "Alexander Nevsky Cathedral",
+            "Sofia",
+            "Bulgaria",
+            42.6953,
+            23.3328,
+            "Iconic cathedral in central Sofia with distinctive golden domes.",
+            "Built in the early 20th century as a memorial to soldiers from the Russo-Turkish War of 1877-1878.",
+            "Cathedral",
+        ),
+        HeritagePlace(
+            "rila_monastery",
+            "Rila Monastery",
+            "Rila",
+            "Bulgaria",
+            42.1338,
+            23.3405,
+            "Historic monastery in the Rila Mountains surrounded by forests.",
+            "Founded in the 10th century, it is one of Bulgaria's most important spiritual and cultural landmarks.",
+            "Monastery",
+        ),
+        HeritagePlace(
+            "plovdiv_theatre",
+            "Ancient Theatre of Philippopolis",
+            "Plovdiv",
+            "Bulgaria",
+            42.1466,
+            24.7510,
+            "Well-preserved Roman theatre still used for events.",
+            "Dating from the 1st century, it is among the best-preserved ancient theatres in the Balkans.",
+            "Ancient Site",
+        ),
+        HeritagePlace(
+            "tsarevets",
+            "Tsarevets Fortress",
+            "Veliko Tarnovo",
+            "Bulgaria",
+            43.0841,
+            25.6506,
+            "Medieval fortress on a hill above the old capital.",
+            "Tsarevets was the main stronghold of the Second Bulgarian Empire.",
+            "Fortress",
+        ),
+        HeritagePlace(
+            "nessebar_old_town",
+            "Old Nessebar",
+            "Nessebar",
+            "Bulgaria",
+            42.6598,
+            27.7360,
+            "Historic peninsula with churches, stone streets, and sea views.",
+            "A UNESCO World Heritage site with layers of Thracian, Greek, Roman, and Byzantine history.",
+            "Historic Town",
+        ),
+        HeritagePlace(
+            "belogradchik_rocks",
+            "Belogradchik Rocks",
+            "Belogradchik",
+            "Bulgaria",
+            43.6271,
+            22.6838,
+            "Striking red rock formations near the old fortress walls.",
+            "The formations stretch across a large area and are tied to local legends and medieval defense history.",
+            "Natural Landmark",
+        ),
     )
 
-    fun hasRegisteredAccount(context: Context): Boolean = prefs(context).getString(KEY_EMAIL, null) != null
+    fun hasRegisteredAccount(context: Context): Boolean =
+        prefs(context).getString(KEY_EMAIL, null) != null
 
     fun register(context: Context, name: String, email: String, password: String): Boolean {
         if (hasRegisteredAccount(context)) return false
@@ -66,7 +128,8 @@ object GameRepository {
         prefs(context).edit().remove(KEY_ACTIVE_EMAIL).apply()
     }
 
-    fun isLoggedIn(context: Context): Boolean = prefs(context).getString(KEY_ACTIVE_EMAIL, null) != null
+    fun isLoggedIn(context: Context): Boolean =
+        prefs(context).getString(KEY_ACTIVE_EMAIL, null) != null
 
     fun loadProfile(context: Context): PlayerProfile {
         val visits = loadVisits(context)
@@ -95,6 +158,7 @@ object GameRepository {
     ): TeamInfo? {
         ensureTeamDirectory(context)
         if (loadTeam(context).hasTeam) return null
+
         val profile = loadProfile(context)
         val code = buildInviteCode(teamName, profile.username)
         val newTeam = TeamInfo(
@@ -109,8 +173,8 @@ object GameRepository {
             memberScores = mapOf(profile.username to 0),
             teamScore = 0,
         )
-        val updatedTeams = loadAllTeams(context) + newTeam
-        saveAllTeams(context, updatedTeams)
+
+        saveAllTeams(context, loadAllTeams(context) + newTeam)
         prefs(context).edit().putString(KEY_CURRENT_TEAM_CODE, code).apply()
         return loadTeam(context)
     }
@@ -118,13 +182,14 @@ object GameRepository {
     fun joinTeamByCode(context: Context, inviteCode: String): JoinTeamResult {
         ensureTeamDirectory(context)
         if (loadTeam(context).hasTeam) return JoinTeamResult.AlreadyInTeam
+
         val teams = loadAllTeams(context)
         val target = teams.firstOrNull { it.inviteCode.equals(inviteCode.trim(), ignoreCase = true) }
             ?: return JoinTeamResult.NotFound
+
         val profile = loadProfile(context)
-        if (target.memberNames.size >= target.maxMembers) {
-            return JoinTeamResult.TeamFull
-        }
+        if (target.memberNames.size >= target.maxMembers) return JoinTeamResult.TeamFull
+
         if (target.isOpen) {
             val updatedTarget = target.copy(
                 memberNames = (target.memberNames + profile.username).distinct(),
@@ -134,9 +199,9 @@ object GameRepository {
             prefs(context).edit().putString(KEY_CURRENT_TEAM_CODE, updatedTarget.inviteCode).apply()
             return JoinTeamResult.Joined(updatedTarget)
         }
-        if (profile.username in target.pendingRequests) {
-            return JoinTeamResult.PendingApproval
-        }
+
+        if (profile.username in target.pendingRequests) return JoinTeamResult.PendingApproval
+
         val updatedTarget = target.copy(pendingRequests = target.pendingRequests + profile.username)
         saveAllTeams(context, teams.map { if (it.inviteCode == target.inviteCode) updatedTarget else it })
         return JoinTeamResult.PendingApproval
@@ -174,6 +239,7 @@ object GameRepository {
         val profile = loadProfile(context)
         if (!current.hasTeam) return null
         if (current.ownerEmail.equals(profile.email, ignoreCase = true)) return null
+
         val updated = current.copy(
             memberNames = current.memberNames - profile.username,
             pendingRequests = current.pendingRequests - profile.username,
@@ -190,24 +256,20 @@ object GameRepository {
         if (!isTeamOwner(context) || requesterName !in team.pendingRequests || team.memberNames.size >= team.maxMembers) {
             return null
         }
-        val updatedMembers = team.memberNames + requesterName
-        val updatedPending = team.pendingRequests - requesterName
-        val updatedScores = team.memberScores + (requesterName to 0)
+
         val updatedTeam = team.copy(
-            memberNames = updatedMembers,
-            pendingRequests = updatedPending,
-            memberScores = updatedScores,
+            memberNames = team.memberNames + requesterName,
+            pendingRequests = team.pendingRequests - requesterName,
+            memberScores = team.memberScores + (requesterName to 0),
         )
         saveAllTeams(context, loadAllTeams(context).map { if (it.inviteCode == team.inviteCode) updatedTeam else it })
         return updatedTeam
     }
 
-    fun getLeaderboard(context: Context): List<Pair<String, Int>> {
-        val team = loadTeam(context)
-        return team.memberScores.entries
+    fun getLeaderboard(context: Context): List<Pair<String, Int>> =
+        loadTeam(context).memberScores.entries
             .sortedByDescending { it.value }
             .map { it.key to it.value }
-    }
 
     fun isTeamOwner(context: Context): Boolean {
         val profile = loadProfile(context)
@@ -218,6 +280,7 @@ object GameRepository {
     fun loadVisits(context: Context): List<PlaceVisit> {
         val raw = prefs(context).getString(KEY_VISITS, "").orEmpty()
         if (raw.isBlank()) return emptyList()
+
         return raw.split(";")
             .mapNotNull { token ->
                 val parts = token.split("|")
@@ -227,25 +290,33 @@ object GameRepository {
             .sortedByDescending { it.visitedAtEpochMs }
     }
 
-    fun placeById(id: String): HeritagePlace? = getPlaces().firstOrNull { it.id == id }
+    fun placeById(id: String): HeritagePlace? =
+        getPlaces().firstOrNull { it.id == id }
 
     fun getDailyChallenge(): DailyChallenge {
         val today = LocalDate.now()
         val place = getPlaces()[today.dayOfYear % getPlaces().size]
-        return DailyChallenge(today.toString(), place, DAILY_BONUS_POINTS, "Отиди до ${place.title} в ${place.city} и го открий днес за бонус.")
+        val prompt = "Visit ${place.title} in ${place.city} today to earn a bonus."
+        return DailyChallenge(today.toString(), place, DAILY_BONUS_POINTS, prompt)
     }
 
     fun distanceMeters(userLatitude: Double, userLongitude: Double, place: HeritagePlace): Float {
         val results = FloatArray(1)
-        android.location.Location.distanceBetween(userLatitude, userLongitude, place.latitude, place.longitude, results)
+        Location.distanceBetween(userLatitude, userLongitude, place.latitude, place.longitude, results)
         return results[0]
     }
 
     fun discoveryRadiusMeters(): Float = DISCOVERY_RADIUS_METERS
 
-    fun canDiscover(distanceMeters: Float): Boolean = distanceMeters <= DISCOVERY_RADIUS_METERS
+    fun canDiscover(distanceMeters: Float): Boolean =
+        distanceMeters <= DISCOVERY_RADIUS_METERS
 
-    fun discoverPlace(context: Context, place: HeritagePlace, userLatitude: Double, userLongitude: Double): DiscoveryOutcome {
+    fun discoverPlace(
+        context: Context,
+        place: HeritagePlace,
+        userLatitude: Double,
+        userLongitude: Double,
+    ): DiscoveryOutcome {
         val distance = distanceMeters(userLatitude, userLongitude, place)
         if (!canDiscover(distance)) return DiscoveryOutcome(false, distance, 0, false)
 
@@ -264,10 +335,14 @@ object GameRepository {
         } else {
             team.memberScores
         }
+
         val editor = prefs(context).edit()
             .putString(KEY_VISITS, updatedVisits.joinToString(";") { "${it.placeId}|${it.visitedAtEpochMs}|${it.pointsEarned}" })
             .putInt(KEY_TOTAL_SCORE, loadProfile(context).totalScore + awardedPoints)
-        if (dailyBonusAwarded) editor.putString(KEY_COMPLETED_DAILY, today)
+
+        if (dailyBonusAwarded) {
+            editor.putString(KEY_COMPLETED_DAILY, today)
+        }
         editor.apply()
 
         if (team.hasTeam && profile.username in team.memberNames) {
@@ -286,10 +361,12 @@ object GameRepository {
         return "${local.toLocalDate()} ${local.toLocalTime().withSecond(0).withNano(0)}"
     }
 
-    private fun prefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private fun prefs(context: Context) =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     private fun ensureTeamDirectory(context: Context) {
         if ((prefs(context).getString(KEY_TEAM_DIRECTORY, "") ?: "").isNotBlank()) return
+
         val seeded = listOf(
             TeamInfo(
                 teamName = "City Sprinters",
@@ -368,9 +445,11 @@ object GameRepository {
             obj.put("memberNames", JSONArray(team.memberNames))
             obj.put("pendingRequests", JSONArray(team.pendingRequests))
             obj.put("teamScore", team.teamScore)
+
             val scores = JSONObject()
             team.memberScores.forEach { (name, score) -> scores.put(name, score) }
             obj.put("memberScores", scores)
+
             array.put(obj)
         }
         prefs(context).edit().putString(KEY_TEAM_DIRECTORY, array.toString()).apply()
@@ -386,6 +465,7 @@ object GameRepository {
 
     private fun jsonObjectToScores(obj: JSONObject?): Map<String, Int> {
         if (obj == null) return emptyMap()
+
         val result = mutableMapOf<String, Int>()
         val keys = obj.keys()
         while (keys.hasNext()) {

@@ -3,6 +3,7 @@ package com.example.game_vol1.admin
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -20,6 +21,7 @@ class ViewPlayersActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!AdminAccessManager.enforceAdminOrRedirect(this)) return
         setContentView(R.layout.activity_view_players)
 
         val toolbar = findViewById<Toolbar>(R.id.playersToolbar)
@@ -39,12 +41,16 @@ class ViewPlayersActivity : AppCompatActivity() {
         rv.adapter = adapter
 
         vm.players.observe(this) { adapter.submitList(it) }
+        vm.operationError.observe(this) { Toast.makeText(this, it, Toast.LENGTH_LONG).show() }
 
         val searchView = findViewById<SearchView>(R.id.searchPlayers)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(q: String?) = true.also { vm.search(q.orEmpty()) }
             override fun onQueryTextChange(q: String?) = true.also { vm.search(q.orEmpty()) }
         })
+
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btnBackAccessible)
+            .setOnClickListener { finish() }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

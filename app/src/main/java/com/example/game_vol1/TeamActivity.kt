@@ -62,6 +62,8 @@ class TeamActivity : AppCompatActivity() {
         joinButton.setOnClickListener { joinByCode() }
         approveButton.setOnClickListener { approveNextRequest() }
         leaveButton.setOnClickListener { leaveTeam() }
+        listOf(createButton, joinButton, approveButton, leaveButton).forEach { it.applyPressFeedback() }
+        findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
 
         renderScreen()
     }
@@ -208,7 +210,10 @@ class TeamActivity : AppCompatActivity() {
         val actionButton = Button(this).apply {
             text = UiLanguageStore.pick(this@TeamActivity, if (team.isOpen) "Присъедини се" else "Изпрати заявка", if (team.isOpen) "Join Team" else "Request Access")
             isEnabled = team.memberNames.size < team.maxMembers
+            background = getDrawable(R.drawable.bg_secondary_button)
+            setTextColor(0xFFFFFFFF.toInt())
             setOnClickListener { joinListedTeam(team) }
+            applyPressFeedback()
         }
 
         card.addView(title)

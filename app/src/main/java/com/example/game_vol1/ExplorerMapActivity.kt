@@ -75,6 +75,8 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         btnDaily.setOnClickListener { startActivity(Intent(this, GoalsActivity::class.java)) }
         btnCameraEmpty.setOnClickListener { openCamera() }
         btnDailyEmpty.setOnClickListener { startActivity(Intent(this, GoalsActivity::class.java)) }
+        listOf(btnDiscover, btnCamera, btnDaily, btnCameraEmpty, btnDailyEmpty).forEach { it.applyPressFeedback() }
+        noPlaceButtons.fadeSlideIn(80L)
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)

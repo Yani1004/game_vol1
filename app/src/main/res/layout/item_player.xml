@@ -113,15 +113,26 @@
                     android:textSize="12sp"
                     android:textColor="@color/admin_gray" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvPlayerQuickStats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Best: 0 · Avg: 0 · Last: Never · Correct: 0%"
+                android:textColor="@color/admin_dark_gray"
+                android:textSize="11sp" />
         </LinearLayout>
 
-        <ImageButton
-            android:layout_width="36dp"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnViewDetails"
+            android:layout_width="wrap_content"
             android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_info_details"
-            android:contentDescription="View details"
-            android:tint="@color/admin_blue"
+            android:backgroundTint="@color/admin_blue"
+            android:text="View Details"
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            android:textColor="@color/white"
             android:layout_marginStart="8dp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

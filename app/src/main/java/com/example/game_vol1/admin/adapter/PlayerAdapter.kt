@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.example.game_vol1.R
 import com.example.game_vol1.database.entity.PlayerEntity
 import java.text.SimpleDateFormat
@@ -30,16 +31,30 @@ class PlayerAdapter(
         private val tvGames: TextView = view.findViewById(R.id.tvPlayerGames)
         private val tvDate: TextView = view.findViewById(R.id.tvPlayerRegDate)
         private val tvRank: TextView = view.findViewById(R.id.tvPlayerRank)
+        private val tvQuickStats: TextView = view.findViewById(R.id.tvPlayerQuickStats)
+        private val btnViewDetails: MaterialButton = view.findViewById(R.id.btnViewDetails)
 
         fun bind(player: PlayerEntity) {
+            val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             tvAvatar.text = player.username.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
             tvUsername.text = player.username
             tvEmail.text = player.email
             tvScore.text = "${player.totalScore} pts"
             tvGames.text = "${player.gamesPlayed} games"
-            tvDate.text = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(player.registrationDate))
+            tvDate.text = formatter.format(Date(player.registrationDate))
             tvRank.text = rank(player.totalScore)
+
+            val average = if (player.gamesPlayed > 0) player.totalScore / player.gamesPlayed else 0
+            val accuracy = if (player.totalGuesses > 0) {
+                "%.0f%%".format(player.correctGuesses * 100f / player.totalGuesses)
+            } else {
+                "N/A"
+            }
+            val lastPlayed = if (player.lastPlayedDate > 0) formatter.format(Date(player.lastPlayedDate)) else "Never"
+            tvQuickStats.text = "Best: ${player.bestScore} · Avg: $average · Last: $lastPlayed · Correct: $accuracy"
+
             itemView.setOnClickListener { onViewDetails(player) }
+            btnViewDetails.setOnClickListener { onViewDetails(player) }
         }
 
         private fun rank(score: Int) = when {

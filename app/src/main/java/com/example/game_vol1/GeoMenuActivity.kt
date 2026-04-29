@@ -49,6 +49,15 @@ class GeoMenuActivity : AppCompatActivity() {
             finishAffinity()
         }
 
+        listOf(
+            R.id.btnPlayRun,
+            R.id.btnGoals,
+            R.id.btnCollectionNew,
+            R.id.btnTeam,
+            R.id.btnLogout,
+        ).forEach { findViewById<Button>(it).applyPressFeedback() }
+        findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
+
         setupNotifications()
         renderScreen()
     }

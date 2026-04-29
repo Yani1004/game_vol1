@@ -1,16 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
-
-}
-
-// Source - https://stackoverflow.com/a/78135333
-// Posted by quynhbkhn
-// Retrieved 2026-04-27, License - CC BY-SA 4.0
-
-plugins {
-
-    id("com.google.dagger.hilt.android")
-    id("kotlin-kapt")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -25,6 +16,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val mapsApiKey = (project.findProperty("MAPS_API_KEY") as? String).orEmpty()
+        val adminEmail = (project.findProperty("ADMIN_EMAIL") as? String) ?: "admin@geoguesser.com"
+        val adminPassword = (project.findProperty("ADMIN_PASSWORD") as? String) ?: "Admin@2024"
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("String", "ADMIN_EMAIL", "\"$adminEmail\"")
+        buildConfigField("String", "ADMIN_PASSWORD", "\"$adminPassword\"")
     }
 
     buildTypes {
@@ -42,6 +40,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
+kotlin {
+    jvmToolchain(11)
 }
 
 dependencies {
@@ -57,6 +63,10 @@ dependencies {
     implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)

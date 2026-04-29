@@ -22,9 +22,7 @@ class AdminDashboardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!AdminAccessManager.isAdmin(this)) {
-            redirectAccessDenied(); return
-        }
+        if (!AdminAccessManager.enforceAdminOrRedirect(this)) return
 
         setContentView(R.layout.activity_admin_dashboard)
 
@@ -81,10 +79,4 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
     }
 
-    private fun redirectAccessDenied() {
-        startActivity(Intent(this, GeoLoginActivity::class.java).apply {
-            putExtra("access_denied", true)
-        })
-        finish()
-    }
 }

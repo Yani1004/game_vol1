@@ -2,6 +2,7 @@ package com.example.game_vol1.admin.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.game_vol1.admin.repository.AdminRepository
@@ -17,6 +18,7 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = AdminRepository(AppDatabase.getInstance(app))
 
     private val _query = MutableStateFlow("")
+    val operationError = MutableLiveData<String>()
     val players = _query.flatMapLatest { q ->
         if (q.isBlank()) repo.getAllPlayers() else repo.searchPlayers(q)
     }.asLiveData()
@@ -25,5 +27,6 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
 
     fun delete(player: PlayerEntity) = viewModelScope.launch {
         repo.deletePlayer(player)
+            .onFailure { operationError.postValue(it.message ?: "Failed to delete player.") }
     }
 }

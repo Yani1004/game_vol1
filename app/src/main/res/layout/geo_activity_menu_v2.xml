@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0F1E"
+    android:background="@drawable/bg_app_gradient"
     android:orientation="vertical">
 
     <ScrollView
@@ -21,7 +21,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#111827"
+                android:background="@drawable/bg_header_gradient"
                 android:orientation="vertical"
                 android:padding="24dp"
                 android:paddingTop="32dp">
@@ -31,7 +31,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="⚔️ Профил"
-                    android:textColor="#A78BFA"
+                    android:textColor="@color/game_primary"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.1" />
@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:text="Твоят център за откриване на места, отбори и дневни цели."
-                    android:textColor="#64748B"
+                    android:textColor="@color/game_text_muted"
                     android:textSize="14sp" />
 
                 <!-- Статистики -->
@@ -68,7 +68,7 @@
                         android:layout_height="90dp"
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_input_field"
+                        android:background="@drawable/bg_stat_tile"
                         android:gravity="center"
                         android:orientation="vertical">
 
@@ -77,7 +77,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textColor="#A78BFA"
+                            android:textColor="@color/game_primary"
                             android:textSize="32sp"
                             android:textStyle="bold" />
 
@@ -87,7 +87,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Посетени места"
-                            android:textColor="#64748B"
+                            android:textColor="@color/game_text_muted"
                             android:textSize="12sp" />
                     </LinearLayout>
 
@@ -96,7 +96,7 @@
                         android:layout_height="90dp"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_input_field"
+                        android:background="@drawable/bg_stat_tile"
                         android:gravity="center"
                         android:orientation="vertical">
 
@@ -105,7 +105,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textColor="#A78BFA"
+                            android:textColor="@color/game_secondary"
                             android:textSize="32sp"
                             android:textStyle="bold" />
 
@@ -115,7 +115,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Общо точки"
-                            android:textColor="#64748B"
+                            android:textColor="@color/game_text_muted"
                             android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -141,7 +141,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🗺️ Днешен маршрут"
-                        android:textColor="#A78BFA"
+                        android:textColor="@color/game_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.1" />
@@ -162,7 +162,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="Излез навън, открий място и поддържай прогреса си жив."
-                        android:textColor="#94A3B8"
+                        android:textColor="@color/game_text_muted"
                         android:textSize="14sp" />
 
                     <Button
@@ -186,7 +186,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="12dp"
                     android:text="Бързи действия"
-                    android:textColor="#A78BFA"
+                    android:textColor="@color/game_primary"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.1" />
@@ -229,7 +229,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="0 места"
-                            android:textColor="#A78BFA"
+                            android:textColor="@color/game_accent"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
@@ -239,7 +239,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:text="Прегледай откритите обекти и бележките си."
-                            android:textColor="#64748B"
+                            android:textColor="@color/game_text_muted"
                             android:textSize="12sp" />
 
                         <Button
@@ -286,7 +286,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="+150 бонус"
-                            android:textColor="#A78BFA"
+                            android:textColor="@color/game_accent"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
@@ -296,7 +296,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:text="Следи бонус задачата и статуса на изпълнение."
-                            android:textColor="#64748B"
+                            android:textColor="@color/game_text_muted"
                             android:textSize="12sp" />
 
                         <Button
@@ -343,7 +343,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="Нямаш активен отбор"
-                        android:textColor="#A78BFA"
+                        android:textColor="@color/game_accent"
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
@@ -353,7 +353,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="Създай отбор, покани приятели и трупайте точки заедно."
-                        android:textColor="#64748B"
+                        android:textColor="@color/game_text_muted"
                         android:textSize="13sp" />
 
                     <Button
@@ -375,7 +375,7 @@
                     android:layout_height="52dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="8dp"
-                    android:background="@drawable/bg_input_field"
+                    android:background="@drawable/bg_button_danger"
                     android:text="🚪 Изход"
                     android:textAllCaps="false"
                     android:textColor="#EF4444"
@@ -390,9 +390,10 @@
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#101B2D"
-        app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white"
+        android:background="@color/game_surface"
+        app:itemIconTint="@color/bottom_nav_item"
+        app:itemRippleColor="@color/game_surface_high"
+        app:itemTextColor="@color/bottom_nav_item"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>
