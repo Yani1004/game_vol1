@@ -69,7 +69,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.livedata.ktx)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-    implementation("com.google.ar:core:1.41.0")
+    implementation("com.google.ar:core:1.54.0")
     implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")

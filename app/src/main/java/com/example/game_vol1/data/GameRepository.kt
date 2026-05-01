@@ -24,6 +24,8 @@ object GameRepository {
     private const val KEY_COMPLETED_DAILY = "completed_daily"
     private const val KEY_TEAM_DIRECTORY = "team_directory"
     private const val KEY_CURRENT_TEAM_CODE = "current_team_code"
+    private const val ADMIN_EMAIL = "admin@geoguesser.local"
+    private const val ADMIN_PASSWORD = "admin123"
 
     private const val DISCOVERY_RADIUS_METERS = 30f
     private const val DAILY_BONUS_POINTS = 150
@@ -141,9 +143,23 @@ object GameRepository {
     }
 
     fun login(context: Context, email: String, password: String): Boolean {
+        val normalizedEmail = email.trim().lowercase()
+        if (normalizedEmail == ADMIN_EMAIL && password == ADMIN_PASSWORD) {
+            prefs(context).edit()
+                .putString(KEY_NAME, "Admin")
+                .putString(KEY_EMAIL, ADMIN_EMAIL)
+                .putString(KEY_PASSWORD, ADMIN_PASSWORD)
+                .putString(KEY_ACTIVE_EMAIL, ADMIN_EMAIL)
+                .putInt(KEY_TOTAL_SCORE, 0)
+                .putString(KEY_VISITS, "")
+                .putString(KEY_COMPLETED_DAILY, "")
+                .apply()
+            return true
+        }
+
         val registeredEmail = prefs(context).getString(KEY_EMAIL, null)?.lowercase()
         val registeredPassword = prefs(context).getString(KEY_PASSWORD, null)
-        val matches = registeredEmail == email.trim().lowercase() && registeredPassword == password
+        val matches = registeredEmail == normalizedEmail && registeredPassword == password
         if (matches) {
             prefs(context).edit().putString(KEY_ACTIVE_EMAIL, registeredEmail).apply()
         }

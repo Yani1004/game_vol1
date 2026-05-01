@@ -7,7 +7,9 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.example.game_vol1.data.AdminRepository
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.game_vol1.data.GameRepository
@@ -41,6 +43,10 @@ class GeoMenuActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnTeam).setOnClickListener {
             startActivity(Intent(this, TeamActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btnAdminPanel).setOnClickListener {
+            startActivity(Intent(this, AdminActivity::class.java))
         }
 
         findViewById<Button>(R.id.btnLogout).setOnClickListener {
@@ -122,6 +128,7 @@ class GeoMenuActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnGoals).text = UiLanguageStore.pick(this, "Виж", "View")
         findViewById<Button>(R.id.btnTeam).text = UiLanguageStore.pick(this, "Отвори отбора", "Open Team Hub")
         findViewById<Button>(R.id.btnLogout).text = UiLanguageStore.pick(this, "Изход", "Log Out")
+        findViewById<Button>(R.id.btnAdminPanel).visibility = if (AdminRepository.isCurrentUserAdmin(this)) View.VISIBLE else View.GONE
 
         findViewById<TextView>(R.id.tvUsername).text = profile.username
         findViewById<TextView>(R.id.tvVisitedValue).text = profile.visitedCount.toString()
