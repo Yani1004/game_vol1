@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.game_vol1.data.GameRepository
 import com.example.game_vol1.data.JoinTeamResult
+import com.example.game_vol1.data.MultiplayerRepository
 import com.example.game_vol1.models.TeamInfo
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -268,6 +269,24 @@ class TeamActivity : AppCompatActivity() {
                 showJoinResult(result, result.team.teamName)
                 joinInput.text?.clear()
                 renderScreen()
+            }
+            JoinTeamResult.NotFound -> {
+                if (MultiplayerRepository.isAvailable(this)) {
+                    joinButton.isEnabled = false
+                    MultiplayerRepository.joinTeamByCode(this, code) { cloudResult ->
+                        runOnUiThread {
+                            joinButton.isEnabled = true
+                            showJoinResult(cloudResult, code)
+                            if (cloudResult is JoinTeamResult.Joined || cloudResult is JoinTeamResult.PendingApproval) {
+                                joinInput.text?.clear()
+                            }
+                            renderScreen()
+                        }
+                    }
+                } else {
+                    showJoinResult(result, "")
+                    renderScreen()
+                }
             }
             else -> {
                 showJoinResult(result, "")

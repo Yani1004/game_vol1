@@ -5,9 +5,14 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.game_vol1.data.GameRepository
+import com.example.game_vol1.data.MultiplayerRepository
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class DiscoveriesActivity : AppCompatActivity() {
+    private var leaderboardListener: ListenerRegistration? = null
+    private var cloudLeaderboard: List<MultiplayerRepository.LeaderboardEntry> = emptyList()
+
     override fun onResume() {
         super.onResume()
         renderScreen()
@@ -19,6 +24,16 @@ class DiscoveriesActivity : AppCompatActivity() {
         findViewById<View>(android.R.id.content).fadeSlideIn()
 
         renderScreen()
+        leaderboardListener = MultiplayerRepository.observeGlobalLeaderboard(this) { entries ->
+            cloudLeaderboard = entries
+            runOnUiThread { renderScreen() }
+        }
+    }
+
+    override fun onDestroy() {
+        leaderboardListener?.remove()
+        leaderboardListener = null
+        super.onDestroy()
     }
 
     private fun renderScreen() {
@@ -44,7 +59,7 @@ class DiscoveriesActivity : AppCompatActivity() {
 
         if (visits.isEmpty()) {
             emptyText.visibility = View.VISIBLE
-            listText.visibility = View.GONE
+            listText.visibility = if (cloudLeaderboard.isEmpty()) View.GONE else View.VISIBLE
             emptyText.text = UiLanguageStore.pick(
                 this,
                 "Още не си открил никакви места.\n\nОтвори картата, приближи се до обект и натисни Открий.",
@@ -53,15 +68,35 @@ class DiscoveriesActivity : AppCompatActivity() {
         } else {
             emptyText.visibility = View.GONE
             listText.visibility = View.VISIBLE
-            listText.text = visits.joinToString("\n\n") { visit ->
-                val place = GameRepository.placeById(visit.placeId)
-                if (place == null) {
-                    UiLanguageStore.pick(this, "Неизвестно място", "Unknown place")
-                } else if (isBg) {
-                    "${place.title}\n${place.city}, ${place.country}\nПосетено: ${GameRepository.formatVisitTime(visit.visitedAtEpochMs)}\nТочки: ${visit.pointsEarned}\n${place.historicalInfo}"
-                } else {
-                    "${place.title}\n${place.city}, ${place.country}\nVisited: ${GameRepository.formatVisitTime(visit.visitedAtEpochMs)}\nPoints: ${visit.pointsEarned}\n${place.historicalInfo}"
+        }
+
+        listText.text = buildString {
+            appendLine(if (MultiplayerRepository.isAvailable(this@DiscoveriesActivity)) "Live Global Leaderboard" else "Local Leaderboard")
+            appendLine()
+            if (cloudLeaderboard.isEmpty()) {
+                appendLine("No cloud scores yet. Discover a place on two devices to populate this list.")
+            } else {
+                cloudLeaderboard.forEach { entry ->
+                    appendLine("${entry.rank}. ${entry.username} - ${entry.totalScore} pts (${entry.visitedCount} places)")
                 }
+            }
+
+            if (visits.isNotEmpty()) {
+                appendLine()
+                appendLine("Your Discoveries")
+                appendLine()
+                append(
+                    visits.joinToString("\n\n") { visit ->
+                        val place = GameRepository.placeById(visit.placeId)
+                        if (place == null) {
+                            UiLanguageStore.pick(this@DiscoveriesActivity, "Неизвестно място", "Unknown place")
+                        } else if (isBg) {
+                            "${place.title}\n${place.city}, ${place.country}\nПосетено: ${GameRepository.formatVisitTime(visit.visitedAtEpochMs)}\nТочки: ${visit.pointsEarned}\n${place.historicalInfo}"
+                        } else {
+                            "${place.title}\n${place.city}, ${place.country}\nVisited: ${GameRepository.formatVisitTime(visit.visitedAtEpochMs)}\nPoints: ${visit.pointsEarned}\n${place.historicalInfo}"
+                        }
+                    },
+                )
             }
         }
 

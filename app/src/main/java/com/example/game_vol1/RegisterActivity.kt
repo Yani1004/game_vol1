@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.game_vol1.data.GameRepository
+import com.example.game_vol1.data.MultiplayerRepository
 
 class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,19 +23,19 @@ class RegisterActivity : AppCompatActivity() {
         val backButton = findViewById<Button>(R.id.btnBackToLogin)
         val languageButton = findViewById<Button>(R.id.btnLanguageToggle)
         val titleView = findViewById<TextView>(R.id.tvRegisterTitle)
+
         listOf(createButton, backButton, languageButton).forEach { it.applyPressFeedback() }
         findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
 
         fun applyLanguage() {
-            val isBulgarian = UiLanguageStore.isBulgarian(this)
-            titleView.text = if (isBulgarian) "Създай профил" else "Create Account"
-            nameInput.hint = if (isBulgarian) "Име" else "Name"
-            emailInput.hint = if (isBulgarian) "Имейл" else "Email"
-            passwordInput.hint = if (isBulgarian) "Парола" else "Password"
-            confirmInput.hint = if (isBulgarian) "Потвърди парола" else "Confirm password"
-            createButton.text = if (isBulgarian) "Създай профил" else "Create Account"
-            backButton.text = if (isBulgarian) "Обратно към вход" else "Back To Login"
-            languageButton.text = if (isBulgarian) "ENG" else "БГ"
+            titleView.text = if (MultiplayerRepository.isAvailable(this)) "Create Multiplayer Account" else "Create Demo Account"
+            nameInput.hint = "Explorer name"
+            emailInput.hint = "Email"
+            passwordInput.hint = "Password"
+            confirmInput.hint = "Confirm password"
+            createButton.text = "Create Account"
+            backButton.text = "Back To Login"
+            languageButton.text = if (UiLanguageStore.isBulgarian(this)) "ENG" else "BG"
         }
 
         applyLanguage()
@@ -44,36 +45,41 @@ class RegisterActivity : AppCompatActivity() {
             val email = emailInput.text.toString().trim()
             val password = passwordInput.text.toString()
             val confirm = confirmInput.text.toString()
-            val isBulgarian = UiLanguageStore.isBulgarian(this)
 
             if (name.isBlank() || email.isBlank() || password.isBlank() || confirm.isBlank()) {
-                Toast.makeText(
-                    this,
-                    if (isBulgarian) "Попълни всички полета за регистрация." else "Fill in all registration fields.",
-                    Toast.LENGTH_SHORT,
-                ).show()
+                Toast.makeText(this, "Fill in all registration fields.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (password != confirm) {
-                Toast.makeText(
-                    this,
-                    if (isBulgarian) "Паролите не съвпадат." else "Passwords do not match.",
-                    Toast.LENGTH_SHORT,
-                ).show()
+                Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (MultiplayerRepository.isAvailable(this)) {
+                createButton.isEnabled = false
+                MultiplayerRepository.register(this, name, email, password) { success, error ->
+                    runOnUiThread {
+                        createButton.isEnabled = true
+                        if (!success) {
+                            Toast.makeText(this, error ?: "Cloud registration failed.", Toast.LENGTH_LONG).show()
+                            return@runOnUiThread
+                        }
+                        GameRepository.saveSessionFromCloud(this, name, email, 0)
+                        startActivity(Intent(this, GeoMenuActivity::class.java))
+                        finishAffinity()
+                    }
+                }
                 return@setOnClickListener
             }
 
             val success = GameRepository.register(this, name, email, password)
             if (!success) {
-                Toast.makeText(
-                    this,
-                    if (isBulgarian) "На това устройство вече съществува профил." else "An account already exists on this device.",
-                    Toast.LENGTH_LONG,
-                ).show()
+                Toast.makeText(this, "An account already exists on this device.", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
+            MultiplayerRepository.syncLocalProfile(this)
             startActivity(Intent(this, GeoMenuActivity::class.java))
             finishAffinity()
         }
