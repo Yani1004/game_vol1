@@ -17,52 +17,13 @@ To enable it on real devices:
 
    `app/google-services.json`
 
-5. Add the Google Services Gradle plugin only after the JSON file exists:
-
-   Root/version catalog:
-
-   ```toml
-   google-services = "4.4.2"
-   ```
-
-   ```toml
-   google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
-   ```
-
-   App plugins:
-
-   ```kotlin
-   alias(libs.plugins.google.services)
-   ```
+5. The Google Services Gradle plugin is already prepared in the project. It is applied only when `app/google-services.json` exists, so the app keeps building before Firebase is connected.
 
 6. In Firebase Console, enable:
 
 - Authentication -> Email/Password
 - Firestore Database
 
-7. Suggested demo Firestore rules:
-
-```txt
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow create, update: if request.auth != null && request.auth.uid == userId;
-      match /visits/{visitId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
-    }
-
-    match /teams/{teamId} {
-      allow read: if request.auth != null;
-      allow create, update: if request.auth != null;
-      match /members/{memberId} {
-        allow read, write: if request.auth != null && request.auth.uid == memberId;
-      }
-    }
-  }
-}
-```
+7. Publish the included demo Firestore rules from `firestore.rules`, or paste that file into Firebase Console -> Firestore Database -> Rules.
 
 For production, move score awarding to Cloud Functions so players cannot fake points by modifying the app.

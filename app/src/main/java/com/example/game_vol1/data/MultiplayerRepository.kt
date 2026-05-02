@@ -278,8 +278,8 @@ object MultiplayerRepository {
                     ownerEmail = doc.getString("ownerEmail") ?: "",
                     maxMembers = (doc.getLong("maxMembers") ?: 4L).toInt(),
                     isOpen = doc.getBoolean("open") ?: true,
-                    memberNames = doc.get("memberNames") as? List<String> ?: emptyList(),
-                    pendingRequests = doc.get("pendingRequests") as? List<String> ?: emptyList(),
+                    memberNames = stringList(doc.get("memberNames")),
+                    pendingRequests = stringList(doc.get("pendingRequests")),
                     teamScore = (doc.getLong("teamScore") ?: 0L).toInt(),
                 )
 
@@ -361,4 +361,7 @@ object MultiplayerRepository {
             .document(uid)
             .set(mapOf("lastSeenAt" to FieldValue.serverTimestamp()), SetOptions.merge())
     }
+
+    private fun stringList(value: Any?): List<String> =
+        (value as? List<*>)?.mapNotNull { it as? String }.orEmpty()
 }

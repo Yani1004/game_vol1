@@ -221,80 +221,80 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="92dp"
+                        android:layout_height="96dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="5dp"
-                        android:background="@drawable/bg_icon_green"
+                        android:background="@drawable/bg_badge_hex_green"
                         android:gravity="center"
-                        android:padding="6dp"
+                        android:padding="8dp"
                         android:text="First Steps\n1 monument\n+50 XP"
                         android:textColor="#FFFFFF"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="92dp"
+                        android:layout_height="96dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="5dp"
-                        android:background="@drawable/bg_icon_purple"
+                        android:background="@drawable/bg_badge_hex_purple"
                         android:gravity="center"
-                        android:padding="6dp"
+                        android:padding="8dp"
                         android:text="Explorer\n5 monuments\nMap bonus"
                         android:textColor="#FFFFFF"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="92dp"
+                        android:layout_height="96dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="5dp"
-                        android:background="@drawable/bg_icon_orange"
+                        android:background="@drawable/bg_badge_hex_orange"
                         android:gravity="center"
-                        android:padding="6dp"
+                        android:padding="8dp"
                         android:text="History Buff\nRead 3 stories\n+100 pts"
                         android:textColor="#FFFFFF"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="92dp"
+                        android:layout_height="96dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="5dp"
-                        android:background="@drawable/bg_icon_blue"
+                        android:background="@drawable/bg_badge_hex_blue"
                         android:gravity="center"
-                        android:padding="6dp"
+                        android:padding="8dp"
                         android:text="City Rover\n3 cities\nCity rank"
                         android:textColor="#FFFFFF"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="92dp"
+                        android:layout_height="96dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="5dp"
-                        android:background="@drawable/bg_icon_pink"
+                        android:background="@drawable/bg_badge_hex_pink"
                         android:gravity="center"
-                        android:padding="6dp"
+                        android:padding="8dp"
                         android:text="Dedicated\n3-day streak\n+150 pts"
                         android:textColor="#FFFFFF"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="92dp"
+                        android:layout_height="96dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="5dp"
-                        android:background="@drawable/bg_icon_orange"
+                        android:background="@drawable/bg_badge_hex_orange"
                         android:gravity="center"
-                        android:padding="6dp"
+                        android:padding="8dp"
                         android:text="Legend\n2,500 pts\nTop badge"
                         android:textColor="#FFFFFF"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
                 </GridLayout>
             </LinearLayout>
@@ -520,6 +520,18 @@
                     android:textColor="@color/game_text"
                     android:textSize="14sp" />
             </LinearLayout>
+
+            <Button
+                android:id="@+id/btnAdminPanel"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_secondary_button"
+                android:text="Admin Panel"
+                android:textAllCaps="false"
+                android:textColor="@color/game_text"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnLogout"

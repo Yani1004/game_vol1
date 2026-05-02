@@ -5,13 +5,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.example.game_vol1.data.AdminRepository
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.game_vol1.admin.AdminAccessManager
+import com.example.game_vol1.admin.AdminDashboardActivity
 import com.example.game_vol1.data.GameRepository
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -46,7 +47,7 @@ class GeoMenuActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnAdminPanel).setOnClickListener {
-            startActivity(Intent(this, AdminActivity::class.java))
+            startActivity(Intent(this, AdminDashboardActivity::class.java))
         }
 
         findViewById<Button>(R.id.btnLogout).setOnClickListener {
@@ -60,6 +61,7 @@ class GeoMenuActivity : AppCompatActivity() {
             R.id.btnGoals,
             R.id.btnCollectionNew,
             R.id.btnTeam,
+            R.id.btnAdminPanel,
             R.id.btnLogout,
         ).forEach { findViewById<Button>(it).applyPressFeedback() }
         findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
@@ -127,8 +129,10 @@ class GeoMenuActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnCollectionNew).text = UiLanguageStore.pick(this, "Отвори", "Open")
         findViewById<Button>(R.id.btnGoals).text = UiLanguageStore.pick(this, "Виж", "View")
         findViewById<Button>(R.id.btnTeam).text = UiLanguageStore.pick(this, "Отвори отбора", "Open Team Hub")
+        findViewById<Button>(R.id.btnAdminPanel).text = UiLanguageStore.pick(this, "Админ панел", "Admin Panel")
         findViewById<Button>(R.id.btnLogout).text = UiLanguageStore.pick(this, "Изход", "Log Out")
-        findViewById<Button>(R.id.btnAdminPanel).visibility = if (AdminRepository.isCurrentUserAdmin(this)) View.VISIBLE else View.GONE
+        findViewById<Button>(R.id.btnAdminPanel).visibility =
+            if (AdminAccessManager.isAdmin(this)) View.VISIBLE else View.GONE
 
         findViewById<TextView>(R.id.tvUsername).text = profile.username
         findViewById<TextView>(R.id.tvVisitedValue).text = profile.visitedCount.toString()
