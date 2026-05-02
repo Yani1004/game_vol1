@@ -9,97 +9,174 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RadialGradient
 import android.graphics.Shader
+import android.net.Uri
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
+import android.widget.FrameLayout
+import com.google.ar.sceneform.Node
+import com.google.ar.sceneform.SceneView
+import com.google.ar.sceneform.math.Quaternion
+import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.rendering.ModelRenderable
 import kotlin.math.cos
 import kotlin.math.sin
 
 class ArPinModelView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : View(context, attrs) {
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var rotation = 0f
+) : FrameLayout(context, attrs) {
+    private val sceneView = SceneView(context)
+    private val fallbackView = FallbackPinView(context)
+    private val pinNode = Node()
+    private var modelLoaded = false
 
-    private val animator = ValueAnimator.ofFloat(0f, 360f).apply {
-        duration = 2600L
-        repeatCount = ValueAnimator.INFINITE
-        addUpdateListener {
-            rotation = it.animatedValue as Float
-            invalidate()
+    init {
+        sceneView.setTransparent(true)
+        sceneView.visibility = INVISIBLE
+        addView(sceneView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        addView(fallbackView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+
+        sceneView.scene.camera.apply {
+            localPosition = Vector3(0f, 0f, 2.2f)
+            setLookDirection(Vector3(0f, 0f, -1f), Vector3(0f, 1f, 0f))
         }
+        pinNode.apply {
+            setParent(sceneView.scene)
+            localPosition = Vector3(0f, -0.12f, -1.15f)
+            localScale = Vector3(0.45f, 0.45f, 0.45f)
+            localRotation = Quaternion.axisAngle(Vector3(0f, 1f, 0f), 180f)
+        }
+
+        loadPinModel()
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        animator.start()
+        resumeRendering()
     }
 
     override fun onDetachedFromWindow() {
-        animator.cancel()
+        pauseRendering()
+        destroyRendering()
         super.onDetachedFromWindow()
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        val w = width.toFloat()
-        val h = height.toFloat()
-        val cx = w / 2f
-        val cy = h * 0.42f
-        val pulse = 0.92f + 0.08f * sin(Math.toRadians(rotation.toDouble())).toFloat()
-        val tilt = cos(Math.toRadians(rotation.toDouble())).toFloat()
+    fun resumeRendering() {
+        if (!modelLoaded && sceneView.visibility != VISIBLE) return
+        runCatching { sceneView.resume() }
+            .onFailure { Log.w(TAG, "Could not resume AR pin renderer.", it) }
+    }
 
-        paint.shader = RadialGradient(cx, h * 0.78f, w * 0.34f, 0x8838BDF8.toInt(), Color.TRANSPARENT, Shader.TileMode.CLAMP)
-        canvas.drawOval(cx - w * 0.34f, h * 0.70f, cx + w * 0.34f, h * 0.86f, paint)
-        paint.shader = null
+    fun pauseRendering() {
+        runCatching { sceneView.pause() }
+            .onFailure { Log.w(TAG, "Could not pause AR pin renderer.", it) }
+    }
 
-        canvas.save()
-        canvas.scale(pulse, pulse, cx, cy)
+    private fun destroyRendering() {
+        runCatching { sceneView.destroy() }
+            .onFailure { Log.w(TAG, "Could not destroy AR pin renderer.", it) }
+    }
 
-        val bodyWidth = w * (0.28f + 0.05f * tilt)
-        val bodyHeight = h * 0.38f
-        val left = cx - bodyWidth
-        val right = cx + bodyWidth
-        val top = cy - bodyHeight * 0.72f
-        val bottom = cy + bodyHeight * 0.72f
+    private fun loadPinModel() {
+        ModelRenderable.builder()
+            .setSource(context, Uri.parse(PIN_MODEL_ASSET))
+            .setIsFilamentGltf(true)
+            .build()
+            .thenAccept { renderable ->
+                modelLoaded = true
+                pinNode.renderable = renderable
+                fallbackView.visibility = GONE
+                sceneView.visibility = VISIBLE
+                resumeRendering()
+            }
+            .exceptionally { throwable ->
+                Log.e(TAG, "Could not load location pin model.", throwable)
+                modelLoaded = false
+                sceneView.visibility = INVISIBLE
+                fallbackView.visibility = VISIBLE
+                null
+            }
+    }
 
-        paint.shader = LinearGradient(left, top, right, bottom, 0xFF22C55E.toInt(), 0xFF38BDF8.toInt(), Shader.TileMode.CLAMP)
-        canvas.drawOval(left, top, right, bottom, paint)
-        paint.shader = null
+    private class FallbackPinView(context: Context) : View(context) {
+        private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var rotation = 0f
 
-        paint.color = 0xAA07111F.toInt()
-        canvas.drawCircle(cx + bodyWidth * 0.08f, cy - bodyHeight * 0.05f, bodyWidth * 0.42f, paint)
-
-        paint.color = 0xFFF8FAFC.toInt()
-        canvas.drawCircle(cx + bodyWidth * 0.08f, cy - bodyHeight * 0.05f, bodyWidth * 0.25f, paint)
-
-        paint.shader = LinearGradient(cx, cy + bodyHeight * 0.35f, cx, h * 0.86f, 0xFF22C55E.toInt(), 0xFFF59E0B.toInt(), Shader.TileMode.CLAMP)
-        val point = Path().apply {
-            moveTo(cx - bodyWidth * 0.48f, cy + bodyHeight * 0.35f)
-            lineTo(cx + bodyWidth * 0.48f, cy + bodyHeight * 0.35f)
-            lineTo(cx, h * 0.86f)
-            close()
+        private val animator = ValueAnimator.ofFloat(0f, 360f).apply {
+            duration = 2600L
+            repeatCount = ValueAnimator.INFINITE
+            addUpdateListener {
+                rotation = it.animatedValue as Float
+                invalidate()
+            }
         }
-        canvas.drawPath(point, paint)
-        paint.shader = null
 
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 6f
-        paint.color = 0xCCF8FAFC.toInt()
-        canvas.drawOval(left + 10f, top + 8f, right - 10f, bottom - 8f, paint)
+        override fun onAttachedToWindow() {
+            super.onAttachedToWindow()
+            animator.start()
+        }
 
-        paint.strokeWidth = 4f
-        paint.color = 0xAA38BDF8.toInt()
-        canvas.drawOval(cx - w * 0.42f, h * 0.07f, cx + w * 0.42f, h * 0.95f, paint)
-        canvas.drawOval(cx - w * 0.30f, h * 0.16f, cx + w * 0.30f, h * 0.88f, paint)
-        paint.style = Paint.Style.FILL
+        override fun onDetachedFromWindow() {
+            animator.cancel()
+            super.onDetachedFromWindow()
+        }
 
-        paint.textAlign = Paint.Align.CENTER
-        paint.textSize = 28f
-        paint.typeface = android.graphics.Typeface.DEFAULT_BOLD
-        paint.color = 0xFFF8FAFC.toInt()
-        canvas.drawText("3D PIN", cx, h * 0.14f, paint)
+        override fun onDraw(canvas: Canvas) {
+            super.onDraw(canvas)
+            val w = width.toFloat()
+            val h = height.toFloat()
+            val cx = w / 2f
+            val cy = h * 0.42f
+            val pulse = 0.92f + 0.08f * sin(Math.toRadians(rotation.toDouble())).toFloat()
+            val tilt = cos(Math.toRadians(rotation.toDouble())).toFloat()
 
-        canvas.restore()
+            paint.shader = RadialGradient(cx, h * 0.78f, w * 0.34f, 0x8838BDF8.toInt(), Color.TRANSPARENT, Shader.TileMode.CLAMP)
+            canvas.drawOval(cx - w * 0.34f, h * 0.70f, cx + w * 0.34f, h * 0.86f, paint)
+            paint.shader = null
+
+            canvas.save()
+            canvas.scale(pulse, pulse, cx, cy)
+
+            val bodyWidth = w * (0.28f + 0.05f * tilt)
+            val bodyHeight = h * 0.38f
+            val left = cx - bodyWidth
+            val right = cx + bodyWidth
+            val top = cy - bodyHeight * 0.72f
+            val bottom = cy + bodyHeight * 0.72f
+
+            paint.shader = LinearGradient(left, top, right, bottom, 0xFFEF4444.toInt(), 0xFFF97316.toInt(), Shader.TileMode.CLAMP)
+            canvas.drawOval(left, top, right, bottom, paint)
+            paint.shader = null
+
+            paint.color = 0xAA07111F.toInt()
+            canvas.drawCircle(cx + bodyWidth * 0.08f, cy - bodyHeight * 0.05f, bodyWidth * 0.42f, paint)
+
+            paint.color = 0xFFF8FAFC.toInt()
+            canvas.drawCircle(cx + bodyWidth * 0.08f, cy - bodyHeight * 0.05f, bodyWidth * 0.25f, paint)
+
+            paint.shader = LinearGradient(cx, cy + bodyHeight * 0.35f, cx, h * 0.86f, 0xFFEF4444.toInt(), 0xFFF59E0B.toInt(), Shader.TileMode.CLAMP)
+            val point = Path().apply {
+                moveTo(cx - bodyWidth * 0.48f, cy + bodyHeight * 0.35f)
+                lineTo(cx + bodyWidth * 0.48f, cy + bodyHeight * 0.35f)
+                lineTo(cx, h * 0.86f)
+                close()
+            }
+            canvas.drawPath(point, paint)
+            paint.shader = null
+
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = 6f
+            paint.color = 0xCCF8FAFC.toInt()
+            canvas.drawOval(left + 10f, top + 8f, right - 10f, bottom - 8f, paint)
+            paint.style = Paint.Style.FILL
+
+            canvas.restore()
+        }
+    }
+
+    companion object {
+        private const val TAG = "ArPinModelView"
+        private const val PIN_MODEL_ASSET = "models/location_pin/location_tag.gltf"
     }
 }

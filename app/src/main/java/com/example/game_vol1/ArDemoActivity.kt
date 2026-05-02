@@ -89,7 +89,7 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
         }
 
         findViewById<TextView>(R.id.tvArTitle).text = title
-        findViewById<TextView>(R.id.tvArSubtitle).text = "Point the camera toward the real pin near $city"
+        findViewById<TextView>(R.id.tvArSubtitle).text = "Point the camera toward the AR pin near $city"
         btnScanPin.setOnClickListener { scanPin() }
         findViewById<Button>(R.id.btnCloseAr).setOnClickListener { finish() }
 
@@ -100,6 +100,7 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
+        arPinModel.resumeRendering()
         startCameraThread()
         registerCompass()
         refreshCurrentLocation()
@@ -107,6 +108,7 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onPause() {
+        arPinModel.pauseRendering()
         sensorManager.unregisterListener(this)
         closeCamera()
         stopCameraThread()
