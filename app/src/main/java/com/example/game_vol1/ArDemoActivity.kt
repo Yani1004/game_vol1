@@ -1,21 +1,19 @@
 package com.example.game_vol1
 
 import android.Manifest
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.SurfaceTexture
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CaptureRequest
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -23,10 +21,26 @@ import android.os.HandlerThread
 import android.view.Surface
 import android.view.TextureView
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.game_vol1.data.GameRepository
@@ -36,10 +50,6 @@ import kotlin.math.abs
 class ArDemoActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var cameraPreview: TextureView
     private lateinit var arPinModel: ArPinModelView
-    private lateinit var arScanLine: View
-    private lateinit var btnScanPin: Button
-    private lateinit var tvArStatus: TextView
-    private lateinit var tvArLiveHelp: TextView
     private lateinit var sensorManager: SensorManager
     private var cameraDevice: CameraDevice? = null
     private var captureSession: CameraCaptureSession? = null
@@ -56,72 +66,68 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
     private var hasMagnetometer = false
     private var headingDegrees = 0f
     private var pinInView = false
+    private var title by mutableStateOf("Selected place")
+    private var subtitle by mutableStateOf("Point the camera toward the AR pin.")
+    private var liveHelp by mutableStateOf("WAITING FOR GPS")
+    private var statusText by mutableStateOf("Waiting for GPS before the world pin can be placed.")
+    private var scanText by mutableStateOf("Find the pin")
+    private var scanEnabled by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_ar_demo)
-
-        cameraPreview = findViewById(R.id.cameraPreview)
-        arPinModel = findViewById(R.id.arPinModel)
-        arScanLine = findViewById(R.id.arScanLine)
-        btnScanPin = findViewById(R.id.btnScanPin)
-        tvArStatus = findViewById(R.id.tvArStatus)
-        tvArLiveHelp = findViewById(R.id.tvArLiveHelp)
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-
-        val title = intent.getStringExtra(EXTRA_PLACE_TITLE) ?: "Selected place"
+        title = intent.getStringExtra(EXTRA_PLACE_TITLE) ?: "Selected place"
         val city = intent.getStringExtra(EXTRA_PLACE_CITY) ?: "Bulgaria"
+        subtitle = "Point the camera toward the AR pin near $city"
         placeId = intent.getStringExtra(EXTRA_PLACE_ID) ?: ""
         val place = GameRepository.placeById(placeId)
-        placeLatitude = if (intent.hasExtra(EXTRA_PLACE_LATITUDE)) {
-            intent.getDoubleExtra(EXTRA_PLACE_LATITUDE, 0.0)
-        } else {
-            place?.latitude
-        }
-        placeLongitude = if (intent.hasExtra(EXTRA_PLACE_LONGITUDE)) {
-            intent.getDoubleExtra(EXTRA_PLACE_LONGITUDE, 0.0)
-        } else {
-            place?.longitude
-        }
+        placeLatitude = if (intent.hasExtra(EXTRA_PLACE_LATITUDE)) intent.getDoubleExtra(EXTRA_PLACE_LATITUDE, 0.0) else place?.latitude
+        placeLongitude = if (intent.hasExtra(EXTRA_PLACE_LONGITUDE)) intent.getDoubleExtra(EXTRA_PLACE_LONGITUDE, 0.0) else place?.longitude
         if (intent.hasExtra(EXTRA_USER_LATITUDE) && intent.hasExtra(EXTRA_USER_LONGITUDE)) {
             userLatitude = intent.getDoubleExtra(EXTRA_USER_LATITUDE, 0.0)
             userLongitude = intent.getDoubleExtra(EXTRA_USER_LONGITUDE, 0.0)
         }
-
-        findViewById<TextView>(R.id.tvArTitle).text = title
-        findViewById<TextView>(R.id.tvArSubtitle).text = "Point the camera toward the AR pin near $city"
-        btnScanPin.setOnClickListener { scanPin() }
-        findViewById<Button>(R.id.btnCloseAr).setOnClickListener { finish() }
-
+        setContent {
+            ArScreen(
+                activity = this,
+                title = title,
+                subtitle = subtitle,
+                liveHelp = liveHelp,
+                status = statusText,
+                scanText = scanText,
+                scanEnabled = scanEnabled,
+                onScan = ::scanPin,
+                onClose = ::finish,
+                onTexture = {
+                    cameraPreview = it
+                    it.surfaceTextureListener = surfaceListener
+                },
+                onPin = {
+                    arPinModel = it
+                    updateScanState()
+                },
+            )
+        }
         updateScanState()
-        startOverlayAnimation()
-        cameraPreview.surfaceTextureListener = surfaceListener
     }
 
     override fun onResume() {
         super.onResume()
-        arPinModel.resumeRendering()
+        if (::arPinModel.isInitialized) arPinModel.resumeRendering()
         startCameraThread()
         registerCompass()
         refreshCurrentLocation()
-        if (cameraPreview.isAvailable) openCamera() else cameraPreview.surfaceTextureListener = surfaceListener
+        if (::cameraPreview.isInitialized) {
+            if (cameraPreview.isAvailable) openCamera() else cameraPreview.surfaceTextureListener = surfaceListener
+        }
     }
 
     override fun onPause() {
-        arPinModel.pauseRendering()
+        if (::arPinModel.isInitialized) arPinModel.pauseRendering()
         sensorManager.unregisterListener(this)
         closeCamera()
         stopCameraThread()
         super.onPause()
-    }
-
-    private fun startOverlayAnimation() {
-        ObjectAnimator.ofFloat(arScanLine, View.TRANSLATION_Y, -120f, 120f).apply {
-            duration = 1300L
-            repeatCount = ValueAnimator.INFINITE
-            repeatMode = ValueAnimator.REVERSE
-            start()
-        }
     }
 
     private fun updateScanState() {
@@ -131,13 +137,11 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
         val placeLat = placeLatitude
         val placeLng = placeLongitude
         if (place == null || lat == null || lng == null || placeLat == null || placeLng == null) {
-            btnScanPin.isEnabled = false
-            btnScanPin.alpha = 0.55f
-            arPinModel.visibility = View.INVISIBLE
-            arScanLine.visibility = View.INVISIBLE
-            tvArLiveHelp.text = "WAITING FOR GPS"
-            tvArLiveHelp.setTextColor(ContextCompat.getColor(this, R.color.game_accent))
-            tvArStatus.text = "Waiting for GPS before the world pin can be placed."
+            scanEnabled = false
+            pinInView = false
+            if (::arPinModel.isInitialized) arPinModel.visibility = View.INVISIBLE
+            liveHelp = "WAITING FOR GPS"
+            statusText = "Waiting for GPS before the world pin can be placed."
             return
         }
 
@@ -146,48 +150,38 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
         val targetBearing = bearingToPlace(lat, lng, placeLat, placeLng)
         val headingDelta = signedAngleDifference(targetBearing, headingDegrees)
         pinInView = GameRepository.canDiscover(distance) && abs(headingDelta) <= HEADING_TOLERANCE_DEGREES
-        arPinModel.visibility = if (pinInView) View.VISIBLE else View.INVISIBLE
-        arScanLine.visibility = if (pinInView) View.VISIBLE else View.INVISIBLE
-        btnScanPin.isEnabled = pinInView
-        btnScanPin.alpha = if (pinInView) 1f else 0.55f
+        if (::arPinModel.isInitialized) arPinModel.visibility = if (pinInView) View.VISIBLE else View.INVISIBLE
+        scanEnabled = pinInView
 
-        tvArStatus.text = when {
+        when {
             !GameRepository.canDiscover(distance) -> {
-                btnScanPin.text = "Move within ${radius}m"
-                tvArLiveHelp.text = "MOVE CLOSER"
-                tvArLiveHelp.setTextColor(ContextCompat.getColor(this, R.color.game_accent))
-                "You are ${distance.toInt()}m away. Get within ${radius}m, then search with the camera."
+                scanText = "Move within ${radius}m"
+                liveHelp = "MOVE CLOSER"
+                statusText = "You are ${distance.toInt()}m away. Get within ${radius}m, then search with the camera."
             }
             pinInView -> {
-                btnScanPin.text = "Scan location pin"
-                tvArLiveHelp.text = "PIN IN VIEW - SCAN"
-                tvArLiveHelp.setTextColor(ContextCompat.getColor(this, R.color.game_primary))
-                "Pin found in camera. Hold steady and scan it."
+                scanText = "Scan location pin"
+                liveHelp = "PIN IN VIEW - SCAN"
+                statusText = "Pin found in camera. Hold steady and scan it."
             }
             headingDelta > 0 -> {
-                btnScanPin.text = "Find the pin"
                 val degrees = abs(headingDelta).toInt()
-                tvArLiveHelp.text = "TURN RIGHT > ${degrees} DEG"
-                tvArLiveHelp.setTextColor(ContextCompat.getColor(this, R.color.game_secondary))
-                "Pin is nearby. Bearing ${targetBearing.toInt()} deg | heading ${headingDegrees.toInt()} deg."
+                scanText = "Find the pin"
+                liveHelp = "TURN RIGHT > ${degrees} DEG"
+                statusText = "Pin is nearby. Bearing ${targetBearing.toInt()} deg | heading ${headingDegrees.toInt()} deg."
             }
             else -> {
-                btnScanPin.text = "Find the pin"
                 val degrees = abs(headingDelta).toInt()
-                tvArLiveHelp.text = "< TURN LEFT ${degrees} DEG"
-                tvArLiveHelp.setTextColor(ContextCompat.getColor(this, R.color.game_secondary))
-                "Pin is nearby. Bearing ${targetBearing.toInt()} deg | heading ${headingDegrees.toInt()} deg."
+                scanText = "Find the pin"
+                liveHelp = "< TURN LEFT ${degrees} DEG"
+                statusText = "Pin is nearby. Bearing ${targetBearing.toInt()} deg | heading ${headingDegrees.toInt()} deg."
             }
         }
     }
 
     private fun registerCompass() {
-        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.also {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
-        }
-        sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)?.also {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
-        }
+        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
+        sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
     }
 
     private fun refreshCurrentLocation() {
@@ -250,16 +244,13 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
             Toast.makeText(this, "GPS is not ready for scanning.", Toast.LENGTH_SHORT).show()
             return
         }
-
         val result = GameRepository.discoverPlace(this, place, lat, lng)
         if (result.success) {
             Toast.makeText(this, "Pin scanned: +${result.pointsAwarded} points", Toast.LENGTH_LONG).show()
-            btnScanPin.text = "Pin scanned"
-            btnScanPin.isEnabled = false
-            btnScanPin.alpha = 0.65f
-            tvArLiveHelp.text = "DISCOVERED"
-            tvArLiveHelp.setTextColor(ContextCompat.getColor(this, R.color.game_primary))
-            tvArStatus.text = "Discovery saved. Return to the map to continue."
+            scanText = "Pin scanned"
+            scanEnabled = false
+            liveHelp = "DISCOVERED"
+            statusText = "Discovery saved. Return to the map to continue."
         } else {
             updateScanState()
             Toast.makeText(this, "Move closer to scan this pin.", Toast.LENGTH_SHORT).show()
@@ -267,10 +258,7 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private val surfaceListener = object : TextureView.SurfaceTextureListener {
-        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-            openCamera()
-        }
-
+        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) { openCamera() }
         override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) = Unit
         override fun onSurfaceTextureUpdated(surface: SurfaceTexture) = Unit
         override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
@@ -307,10 +295,10 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
 
     @SuppressLint("MissingPermission")
     private fun openCameraWithPermission() {
+        if (!::cameraPreview.isInitialized) return
         val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
         val cameraId = manager.cameraIdList.firstOrNull { id ->
-            manager.getCameraCharacteristics(id).get(CameraCharacteristics.LENS_FACING) ==
-                    CameraCharacteristics.LENS_FACING_BACK
+            manager.getCameraCharacteristics(id).get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK
         } ?: manager.cameraIdList.firstOrNull()
 
         if (cameraId == null) {
@@ -325,12 +313,10 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
                     cameraDevice = camera
                     startPreview(camera)
                 }
-
                 override fun onDisconnected(camera: CameraDevice) {
                     camera.close()
                     cameraDevice = null
                 }
-
                 override fun onError(camera: CameraDevice, error: Int) {
                     camera.close()
                     cameraDevice = null
@@ -349,7 +335,6 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
             addTarget(surface)
             set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
         }
-
         camera.createCaptureSession(
             listOf(surface),
             object : CameraCaptureSession.StateCallback() {
@@ -357,7 +342,6 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
                     captureSession = session
                     session.setRepeatingRequest(request.build(), null, cameraHandler)
                 }
-
                 override fun onConfigureFailed(session: CameraCaptureSession) {
                     Toast.makeText(this@ArDemoActivity, "Could not start camera preview.", Toast.LENGTH_SHORT).show()
                 }
@@ -385,5 +369,53 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
         const val EXTRA_USER_LONGITUDE = "extra_user_longitude"
         private const val HEADING_TOLERANCE_DEGREES = 35f
         private const val REQUEST_CAMERA = 42
+    }
+}
+
+@Composable
+private fun ArScreen(
+    activity: ArDemoActivity,
+    title: String,
+    subtitle: String,
+    liveHelp: String,
+    status: String,
+    scanText: String,
+    scanEnabled: Boolean,
+    onScan: () -> Unit,
+    onClose: () -> Unit,
+    onTexture: (TextureView) -> Unit,
+    onPin: (ArPinModelView) -> Unit,
+) {
+    HuntTheme {
+        Box(Modifier.fillMaxSize().background(Color.Black)) {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { context -> TextureView(context).also(onTexture) },
+            )
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { context -> ArPinModelView(context).also(onPin) },
+            )
+            Column(
+                modifier = Modifier.align(Alignment.TopCenter).padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                HuntPanel(accent = HuntColors.Blue) {
+                    Text(title, color = HuntColors.Text, fontWeight = FontWeight.Black)
+                    Text(subtitle, color = HuntColors.Muted)
+                }
+            }
+            Column(
+                modifier = Modifier.align(Alignment.BottomCenter).padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                HuntPanel(accent = if (scanEnabled) HuntColors.Green else HuntColors.Gold) {
+                    Text(liveHelp, color = if (scanEnabled) HuntColors.Green else HuntColors.Gold, fontWeight = FontWeight.Black)
+                    Text(status, color = HuntColors.Muted)
+                    HuntButton(scanText, onScan, color = if (scanEnabled) HuntColors.Green else HuntColors.SlateLight)
+                    HuntButton("Close", onClose, color = HuntColors.Rose)
+                }
+            }
+        }
     }
 }

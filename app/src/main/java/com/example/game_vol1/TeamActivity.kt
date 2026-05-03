@@ -1,334 +1,246 @@
 package com.example.game_vol1
 
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.example.game_vol1.data.GameRepository
 import com.example.game_vol1.data.JoinTeamResult
 import com.example.game_vol1.data.MultiplayerRepository
 import com.example.game_vol1.models.TeamInfo
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.switchmaterial.SwitchMaterial
 
 class TeamActivity : AppCompatActivity() {
-    private lateinit var createInput: EditText
-    private lateinit var descriptionInput: EditText
-    private lateinit var maxMembersInput: EditText
-    private lateinit var openSwitch: SwitchMaterial
-    private lateinit var joinInput: EditText
-    private lateinit var teamNameView: TextView
-    private lateinit var teamMetaView: TextView
-    private lateinit var teamMembersView: TextView
-    private lateinit var inviteView: TextView
-    private lateinit var ownerView: TextView
-    private lateinit var pendingView: TextView
-    private lateinit var leaderboardView: TextView
-    private lateinit var availableTeamsContainer: LinearLayout
-    private lateinit var createButton: Button
-    private lateinit var joinButton: Button
-    private lateinit var approveButton: Button
-    private lateinit var leaveButton: Button
+    private var currentTeam by mutableStateOf(TeamInfo())
+    private var browseableTeams by mutableStateOf<List<TeamInfo>>(emptyList())
+    private var teamLeaderboard by mutableStateOf<List<TeamInfo>>(emptyList())
+    private var memberLeaderboard by mutableStateOf<List<Pair<String, Int>>>(emptyList())
+    private var isOwner by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.geo_activity_team)
-
-        createInput = findViewById(R.id.etTeamName)
-        descriptionInput = findViewById(R.id.etTeamDescription)
-        maxMembersInput = findViewById(R.id.etMaxMembers)
-        openSwitch = findViewById(R.id.switchOpenTeam)
-        joinInput = findViewById(R.id.etInviteCode)
-        teamNameView = findViewById(R.id.tvTeamName)
-        teamMetaView = findViewById(R.id.tvTeamMeta)
-        teamMembersView = findViewById(R.id.tvTeamMembers)
-        inviteView = findViewById(R.id.tvInviteCodeValue)
-        ownerView = findViewById(R.id.tvOwnerHint)
-        pendingView = findViewById(R.id.tvPendingRequests)
-        leaderboardView = findViewById(R.id.tvLeaderboard)
-        availableTeamsContainer = findViewById(R.id.availableTeamsContainer)
-        createButton = findViewById(R.id.btnCreateTeam)
-        joinButton = findViewById(R.id.btnJoinTeam)
-        approveButton = findViewById(R.id.btnApproveNext)
-        leaveButton = findViewById(R.id.btnLeaveTeam)
-
-        maxMembersInput.setText("4")
-        openSwitch.isChecked = true
-
-        createButton.setOnClickListener { createTeam() }
-        joinButton.setOnClickListener { joinByCode() }
-        approveButton.setOnClickListener { approveNextRequest() }
-        leaveButton.setOnClickListener { leaveTeam() }
-        listOf(createButton, joinButton, approveButton, leaveButton).forEach { it.applyPressFeedback() }
-        findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
-
-        renderScreen()
+        refresh()
+        setContent {
+            TeamScreen(
+                activity = this,
+                team = currentTeam,
+                isOwner = isOwner,
+                browseableTeams = browseableTeams,
+                teamLeaderboard = teamLeaderboard,
+                memberLeaderboard = memberLeaderboard,
+                onCreate = ::createTeam,
+                onJoinCode = ::joinByCode,
+                onJoinListed = ::joinListedTeam,
+                onApprove = ::approveNextRequest,
+                onLeave = ::leaveTeam,
+            )
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (::teamNameView.isInitialized) renderScreen()
+        refresh()
     }
 
-    private fun renderScreen() {
-        val team = GameRepository.loadTeam(this)
-        val hasTeam = team.hasTeam
-        val isOwner = GameRepository.isTeamOwner(this)
-        val isBg = UiLanguageStore.isBulgarian(this)
-        val scoreLabel = UiLanguageStore.pick(this, "т.", "pts")
-
-        findViewById<TextView>(R.id.tvTeamsSection).text = UiLanguageStore.pick(this, "Отбори", "Teams")
-        findViewById<TextView>(R.id.tvCreateTeamLabel).text = UiLanguageStore.pick(this, "Създай отбор", "Create Team")
-        findViewById<TextView>(R.id.tvJoinTeamLabel).text = UiLanguageStore.pick(this, "Присъедини се към отбор", "Join Team")
-        findViewById<TextView>(R.id.tvInviteCodeLabel).text = UiLanguageStore.pick(this, "Код за покана", "Invite Code")
-        findViewById<TextView>(R.id.tvMembersLabel).text = UiLanguageStore.pick(this, "Участници", "Members")
-        findViewById<TextView>(R.id.tvLeaderboardLabel).text = UiLanguageStore.pick(this, "Класация", "Team Leaderboard")
-        findViewById<TextView>(R.id.tvAvailableTeamsLabel).text = UiLanguageStore.pick(this, "Налични отбори", "Available Teams")
-        createInput.hint = UiLanguageStore.pick(this, "Име на отбора", "Team name")
-        descriptionInput.hint = UiLanguageStore.pick(this, "Описание на отбора", "Team description")
-        maxMembersInput.hint = UiLanguageStore.pick(this, "Максимален брой участници", "Max members")
-        openSwitch.text = UiLanguageStore.pick(this, "Отворен отбор (иначе се изисква одобрение)", "Open team (otherwise owner approval is required)")
-        joinInput.hint = UiLanguageStore.pick(this, "Код за покана", "Invite code")
-        createButton.text = UiLanguageStore.pick(this, "Създай отбор", "Create Team")
-        joinButton.text = UiLanguageStore.pick(this, "Присъедини се", "Join Team")
-        approveButton.text = UiLanguageStore.pick(this, "Одобри следваща заявка", "Approve Next Request")
-        leaveButton.text = UiLanguageStore.pick(this, "Напусни отбора", "Leave Team")
-
-        createInput.isEnabled = !hasTeam
-        descriptionInput.isEnabled = !hasTeam
-        maxMembersInput.isEnabled = !hasTeam
-        openSwitch.isEnabled = !hasTeam
-        joinInput.isEnabled = !hasTeam
-        createButton.isEnabled = !hasTeam
-        joinButton.isEnabled = !hasTeam
-
-        if (!hasTeam) {
-            teamNameView.text = UiLanguageStore.pick(this, "Все още нямаш отбор", "No team yet")
-            teamMetaView.text = UiLanguageStore.pick(
-                this,
-                "Създай отбор с лимит и описание или се присъедини чрез код за покана.",
-                "Create a team with a member cap and description, or join one with an invite code.",
-            )
-            teamMembersView.text = UiLanguageStore.pick(this, "Участниците ще се покажат тук.", "Members will appear here.")
-            inviteView.text = "-"
-            ownerView.text = UiLanguageStore.pick(this, "Собственикът на отбора може да кани приятели.", "Only team owners can invite friends.")
-            pendingView.text = UiLanguageStore.pick(this, "Няма чакащи заявки.", "No pending requests.")
-            approveButton.visibility = View.GONE
-            leaveButton.visibility = View.GONE
-        } else {
-            teamNameView.text = team.teamName
-            val membersLabel = if (isBg) "членове" else "members"
-            teamMetaView.text = buildString {
-                append(UiLanguageStore.pick(this@TeamActivity, if (team.isOpen) "Отворен отбор" else "Затворен отбор", if (team.isOpen) "Open team" else "Locked team"))
-                append(" | ${team.memberNames.size}/${team.maxMembers} $membersLabel | ")
-                append(UiLanguageStore.pick(this@TeamActivity, "общ резултат", "shared score"))
-                append(" ${team.teamScore}\n")
-                append(team.description.ifBlank { UiLanguageStore.pick(this@TeamActivity, "Няма описание.", "No description provided yet.") })
-            }
-            teamMembersView.text = team.memberNames.joinToString("\n")
-            inviteView.text = team.inviteCode
-            ownerView.text = if (isOwner) {
-                UiLanguageStore.pick(this, "Ти си собственик. Сподели кода и одобрявай заявки за затворен отбор.", "You are the owner. Share this code with friends and review locked-team requests.")
-            } else {
-                UiLanguageStore.pick(this, "Ти си член на този отбор.", "You're a member of this team.")
-            }
-            pendingView.text = if (team.pendingRequests.isEmpty()) {
-                UiLanguageStore.pick(this, "Няма чакащи заявки.", "No pending requests.")
-            } else {
-                UiLanguageStore.pick(this, "Чакащи: ${team.pendingRequests.joinToString(", ")}", "Pending: ${team.pendingRequests.joinToString(", ")}")
-            }
-            approveButton.visibility = if (isOwner) View.VISIBLE else View.GONE
-            leaveButton.visibility = if (isOwner) View.GONE else View.VISIBLE
-        }
-
-        leaderboardView.text = buildLeaderboard(hasTeam, scoreLabel)
-        renderAvailableTeams()
-        AppNavigation.bind(this, findViewById<BottomNavigationView>(R.id.bottomNav), R.id.nav_profile)
+    private fun refresh() {
+        currentTeam = GameRepository.loadTeam(this)
+        browseableTeams = GameRepository.getBrowseableTeams(this)
+        teamLeaderboard = GameRepository.getTeamLeaderboard(this)
+        memberLeaderboard = GameRepository.getLeaderboard(this)
+        isOwner = GameRepository.isTeamOwner(this)
     }
 
-    private fun buildLeaderboard(hasTeam: Boolean, scoreLabel: String): String {
-        val teamLeaderboard = GameRepository.getTeamLeaderboard(this)
-            .mapIndexed { index, entry -> "${index + 1}. ${entry.teamName} - ${entry.teamScore} $scoreLabel" }
-            .joinToString("\n")
-            .ifBlank { UiLanguageStore.pick(this, "Няма налични отбори.", "No teams available.") }
-
-        if (!hasTeam) return teamLeaderboard
-
-        val memberLeaderboard = GameRepository.getLeaderboard(this)
-            .mapIndexed { index, pair -> "${index + 1}. ${pair.first} - ${pair.second} $scoreLabel" }
-            .joinToString("\n")
-            .ifBlank { UiLanguageStore.pick(this, "Все още няма точки по участници.", "No member points yet.") }
-
-        return "${UiLanguageStore.pick(this, "Участници", "Members")}\n$memberLeaderboard\n\n${UiLanguageStore.pick(this, "Отбори", "Teams")}\n$teamLeaderboard"
-    }
-
-    private fun renderAvailableTeams() {
-        availableTeamsContainer.removeAllViews()
-        val teams = GameRepository.getBrowseableTeams(this)
-        if (teams.isEmpty()) {
-            availableTeamsContainer.addView(TextView(this).apply {
-                text = UiLanguageStore.pick(this@TeamActivity, "В момента няма други налични отбори.", "No other teams available right now.")
-                setTextColor(0xFFD7DFEC.toInt())
-            })
-            return
-        }
-        teams.forEach { availableTeamsContainer.addView(makeTeamCard(it)) }
-    }
-
-    private fun makeTeamCard(team: TeamInfo): View {
-        val card = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(24, 24, 24, 24)
-            background = getDrawable(R.drawable.bg_dark_card)
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-            ).apply { bottomMargin = 20 }
-        }
-
-        val title = TextView(this).apply {
-            text = team.teamName
-            textSize = 18f
-            setTextColor(0xFFFFFFFF.toInt())
-        }
-        val meta = TextView(this).apply {
-            val accessLabel = UiLanguageStore.pick(this@TeamActivity, if (team.isOpen) "Отворен" else "Затворен", if (team.isOpen) "Open" else "Locked")
-            val membersLabel = UiLanguageStore.pick(this@TeamActivity, "членове", "members")
-            val scoreLabel = UiLanguageStore.pick(this@TeamActivity, "т.", "pts")
-            text = "$accessLabel | ${team.memberNames.size}/${team.maxMembers} $membersLabel | ${team.teamScore} $scoreLabel"
-            textSize = 14f
-            setTextColor(0xFFB8C7E0.toInt())
-        }
-        val description = TextView(this).apply {
-            text = team.description.ifBlank { UiLanguageStore.pick(this@TeamActivity, "Няма описание.", "No description provided.") }
-            textSize = 14f
-            setTextColor(0xFFD7DFEC.toInt())
-        }
-        val actionButton = Button(this).apply {
-            text = UiLanguageStore.pick(this@TeamActivity, if (team.isOpen) "Присъедини се" else "Изпрати заявка", if (team.isOpen) "Join Team" else "Request Access")
-            isEnabled = team.memberNames.size < team.maxMembers
-            background = getDrawable(R.drawable.bg_secondary_button)
-            setTextColor(0xFFFFFFFF.toInt())
-            setOnClickListener { joinListedTeam(team) }
-            applyPressFeedback()
-        }
-
-        card.addView(title)
-        card.addView(meta)
-        card.addView(description)
-        card.addView(actionButton)
-        return card
-    }
-
-    private fun joinListedTeam(team: TeamInfo) {
-        val result = if (team.isOpen) {
-            GameRepository.joinOpenTeam(this, team.inviteCode)
-        } else {
-            GameRepository.requestJoinLockedTeam(this, team.inviteCode)
-        }
-        showJoinResult(result, team.teamName)
-        renderScreen()
-    }
-
-    private fun createTeam() {
-        val name = createInput.text.toString().trim()
-        val description = descriptionInput.text.toString().trim()
-        val maxMembers = maxMembersInput.text.toString().toIntOrNull()?.coerceIn(2, 20) ?: 4
+    private fun createTeam(name: String, description: String, maxMembers: String, open: Boolean) {
+        val max = maxMembers.toIntOrNull()?.coerceIn(2, 20) ?: 4
         if (name.isBlank()) {
-            Toast.makeText(this, UiLanguageStore.pick(this, "Въведи име на отбора.", "Enter a team name first."), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Enter a team name first.", Toast.LENGTH_SHORT).show()
             return
         }
-
-        val created = GameRepository.createTeam(this, name, description, maxMembers, openSwitch.isChecked)
-        if (created == null) {
-            Toast.makeText(this, UiLanguageStore.pick(this, "Този профил вече е в отбор.", "This account is already in a team."), Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        createInput.text?.clear()
-        descriptionInput.text?.clear()
-        maxMembersInput.setText("4")
-        openSwitch.isChecked = true
-        Toast.makeText(this, UiLanguageStore.pick(this, "${created.teamName} е създаден.", "${created.teamName} is ready."), Toast.LENGTH_SHORT).show()
-        renderScreen()
+        val created = GameRepository.createTeam(this, name, description, max, open)
+        Toast.makeText(this, created?.let { "${it.teamName} is ready." } ?: "This account is already in a team.", Toast.LENGTH_SHORT).show()
+        refresh()
     }
 
-    private fun joinByCode() {
-        val code = joinInput.text.toString().trim()
+    private fun joinByCode(code: String) {
         if (code.isBlank()) {
-            Toast.makeText(this, UiLanguageStore.pick(this, "Въведи код за покана.", "Enter an invite code."), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Enter an invite code.", Toast.LENGTH_SHORT).show()
             return
         }
-
         when (val result = GameRepository.joinTeamByCode(this, code)) {
-            is JoinTeamResult.Joined -> {
-                showJoinResult(result, result.team.teamName)
-                joinInput.text?.clear()
-                renderScreen()
-            }
             JoinTeamResult.NotFound -> {
                 if (MultiplayerRepository.isAvailable(this)) {
-                    joinButton.isEnabled = false
                     MultiplayerRepository.joinTeamByCode(this, code) { cloudResult ->
                         runOnUiThread {
-                            joinButton.isEnabled = true
                             showJoinResult(cloudResult, code)
-                            if (cloudResult is JoinTeamResult.Joined || cloudResult is JoinTeamResult.PendingApproval) {
-                                joinInput.text?.clear()
-                            }
-                            renderScreen()
+                            refresh()
                         }
                     }
                 } else {
-                    showJoinResult(result, "")
-                    renderScreen()
+                    showJoinResult(result, code)
                 }
             }
-            else -> {
-                showJoinResult(result, "")
-                if (result is JoinTeamResult.PendingApproval) joinInput.text?.clear()
-                renderScreen()
-            }
+            else -> showJoinResult(result, code)
         }
+        refresh()
+    }
+
+    private fun joinListedTeam(team: TeamInfo) {
+        val result = if (team.isOpen) GameRepository.joinOpenTeam(this, team.inviteCode) else GameRepository.requestJoinLockedTeam(this, team.inviteCode)
+        showJoinResult(result, team.teamName)
+        refresh()
     }
 
     private fun approveNextRequest() {
-        val nextRequest = GameRepository.loadTeam(this).pendingRequests.firstOrNull()
-        if (nextRequest == null) {
-            Toast.makeText(this, UiLanguageStore.pick(this, "Няма чакащи заявки.", "No pending requests."), Toast.LENGTH_SHORT).show()
+        val next = GameRepository.loadTeam(this).pendingRequests.firstOrNull()
+        if (next == null) {
+            Toast.makeText(this, "No pending requests.", Toast.LENGTH_SHORT).show()
             return
         }
-
-        val approved = GameRepository.approveRequest(this, nextRequest)
-        if (approved == null) {
-            Toast.makeText(this, UiLanguageStore.pick(this, "Заявката не може да бъде одобрена.", "Could not approve the request."), Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, UiLanguageStore.pick(this, "$nextRequest вече е в отбора.", "$nextRequest joined the team."), Toast.LENGTH_SHORT).show()
-            renderScreen()
-        }
+        Toast.makeText(this, if (GameRepository.approveRequest(this, next) == null) "Could not approve the request." else "$next joined the team.", Toast.LENGTH_SHORT).show()
+        refresh()
     }
 
     private fun leaveTeam() {
-        val leftTeam = GameRepository.leaveCurrentTeam(this)
-        if (leftTeam == null) {
-            Toast.makeText(this, UiLanguageStore.pick(this, "Собственикът не може да напусне преди да има прехвърляне на собственост.", "Team owners cannot leave until ownership transfer exists."), Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(this, UiLanguageStore.pick(this, "Напусна ${leftTeam.teamName}.", "You left ${leftTeam.teamName}."), Toast.LENGTH_SHORT).show()
-            renderScreen()
-        }
+        val left = GameRepository.leaveCurrentTeam(this)
+        Toast.makeText(this, left?.let { "You left ${it.teamName}." } ?: "Team owners cannot leave until ownership transfer exists.", Toast.LENGTH_LONG).show()
+        refresh()
     }
 
     private fun showJoinResult(result: JoinTeamResult, teamName: String) {
-        when (result) {
-            is JoinTeamResult.Joined -> Toast.makeText(this, UiLanguageStore.pick(this, "Присъедини се към ${result.team.teamName}.", "Joined ${result.team.teamName}."), Toast.LENGTH_SHORT).show()
-            JoinTeamResult.PendingApproval -> Toast.makeText(this, UiLanguageStore.pick(this, "Заявката е изпратена${if (teamName.isNotBlank()) " към $teamName" else ""}.", "Request sent${if (teamName.isNotBlank()) " to $teamName" else ""}."), Toast.LENGTH_SHORT).show()
-            JoinTeamResult.TeamFull -> Toast.makeText(this, UiLanguageStore.pick(this, "Този отбор е пълен.", "That team is full."), Toast.LENGTH_SHORT).show()
-            JoinTeamResult.NotFound -> Toast.makeText(this, UiLanguageStore.pick(this, "Кодът за покана не е намерен.", "Invite code not found on this device yet."), Toast.LENGTH_LONG).show()
-            JoinTeamResult.AlreadyInTeam -> Toast.makeText(this, UiLanguageStore.pick(this, "Вече си в отбор.", "You are already in a team."), Toast.LENGTH_SHORT).show()
+        val message = when (result) {
+            is JoinTeamResult.Joined -> "Joined ${result.team.teamName}."
+            JoinTeamResult.PendingApproval -> "Request sent${if (teamName.isNotBlank()) " to $teamName" else ""}."
+            JoinTeamResult.TeamFull -> "That team is full."
+            JoinTeamResult.NotFound -> "Invite code not found on this device yet."
+            JoinTeamResult.AlreadyInTeam -> "You are already in a team."
+        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+}
+
+@Composable
+private fun TeamScreen(
+    activity: TeamActivity,
+    team: TeamInfo,
+    isOwner: Boolean,
+    browseableTeams: List<TeamInfo>,
+    teamLeaderboard: List<TeamInfo>,
+    memberLeaderboard: List<Pair<String, Int>>,
+    onCreate: (String, String, String, Boolean) -> Unit,
+    onJoinCode: (String) -> Unit,
+    onJoinListed: (TeamInfo) -> Unit,
+    onApprove: () -> Unit,
+    onLeave: () -> Unit,
+) {
+    var name by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var maxMembers by remember { mutableStateOf("4") }
+    var open by remember { mutableStateOf(true) }
+    var inviteCode by remember { mutableStateOf("") }
+
+    HuntTheme {
+        HuntScaffold(activity = activity, selected = "profile") { modifier ->
+            LazyColumn(
+                modifier = modifier.fillMaxSize().padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                item { HuntTitle("Teams", "Create, join, and climb the shared leaderboard.") }
+                item {
+                    HuntPanel(accent = if (team.hasTeam) HuntColors.Green else HuntColors.Blue) {
+                        Text(if (team.hasTeam) team.teamName else "No team yet", color = HuntColors.Text, fontWeight = FontWeight.Black)
+                        Text(
+                            if (team.hasTeam) "${if (team.isOpen) "Open" else "Locked"} | ${team.memberNames.size}/${team.maxMembers} members | ${team.teamScore} pts" else "Create a team or join one with an invite code.",
+                            color = HuntColors.Muted,
+                        )
+                        if (team.hasTeam) {
+                            Text("Invite code: ${team.inviteCode}", color = HuntColors.Gold, fontWeight = FontWeight.Bold)
+                            Text(team.description.ifBlank { "No description provided yet." }, color = HuntColors.Muted)
+                            Text("Members: ${team.memberNames.joinToString(", ")}", color = HuntColors.BlueSoft)
+                            Text(if (team.pendingRequests.isEmpty()) "No pending requests." else "Pending: ${team.pendingRequests.joinToString(", ")}", color = HuntColors.Muted)
+                            if (isOwner) HuntButton("Approve Next Request", onApprove, color = HuntColors.Blue)
+                            if (!isOwner) HuntButton("Leave Team", onLeave, color = HuntColors.Rose)
+                        }
+                    }
+                }
+                if (!team.hasTeam) {
+                    item {
+                        HuntPanel(accent = HuntColors.Green) {
+                            Text("Create Team", color = HuntColors.Text, fontWeight = FontWeight.Black)
+                            HuntField(name, { name = it }, "Team name")
+                            HuntField(description, { description = it }, "Team description")
+                            HuntField(maxMembers, { maxMembers = it }, "Max members", keyboardType = KeyboardType.Number)
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Switch(checked = open, onCheckedChange = { open = it })
+                                Text("Open team", color = HuntColors.Muted)
+                            }
+                            HuntButton("Create Team", {
+                                onCreate(name.trim(), description.trim(), maxMembers, open)
+                                name = ""
+                                description = ""
+                                maxMembers = "4"
+                                open = true
+                            })
+                        }
+                    }
+                    item {
+                        HuntPanel(accent = HuntColors.Blue) {
+                            Text("Join Team", color = HuntColors.Text, fontWeight = FontWeight.Black)
+                            HuntField(inviteCode, { inviteCode = it }, "Invite code")
+                            HuntButton("Join Team", {
+                                onJoinCode(inviteCode.trim())
+                                inviteCode = ""
+                            }, color = HuntColors.Blue)
+                        }
+                    }
+                }
+                item {
+                    HuntPanel(accent = HuntColors.Gold) {
+                        Text("Team Leaderboard", color = HuntColors.Text, fontWeight = FontWeight.Black)
+                        if (memberLeaderboard.isNotEmpty()) {
+                            Text("Members", color = HuntColors.BlueSoft, fontWeight = FontWeight.Bold)
+                            memberLeaderboard.forEachIndexed { index, entry -> Text("${index + 1}. ${entry.first} - ${entry.second} pts", color = HuntColors.Muted) }
+                        }
+                        Text("Teams", color = HuntColors.BlueSoft, fontWeight = FontWeight.Bold)
+                        if (teamLeaderboard.isEmpty()) Text("No teams available.", color = HuntColors.Muted)
+                        teamLeaderboard.forEachIndexed { index, entry -> Text("${index + 1}. ${entry.teamName} - ${entry.teamScore} pts", color = HuntColors.Muted) }
+                    }
+                }
+                item {
+                    Text("Available Teams", color = HuntColors.Text, fontWeight = FontWeight.Black)
+                }
+                if (browseableTeams.isEmpty()) {
+                    item {
+                        HuntPanel { Text("No other teams available right now.", color = HuntColors.Muted) }
+                    }
+                } else {
+                    items(browseableTeams, key = { it.inviteCode }) { listed ->
+                        HuntPanel(accent = if (listed.isOpen) HuntColors.Green else HuntColors.Rose) {
+                            Text(listed.teamName, color = HuntColors.Text, fontWeight = FontWeight.Black)
+                            Text("${if (listed.isOpen) "Open" else "Locked"} | ${listed.memberNames.size}/${listed.maxMembers} members | ${listed.teamScore} pts", color = HuntColors.Muted)
+                            Text(listed.description.ifBlank { "No description provided." }, color = HuntColors.Muted)
+                            HuntButton(if (listed.isOpen) "Join Team" else "Request Access", { onJoinListed(listed) }, color = HuntColors.Blue)
+                        }
+                    }
+                }
+            }
         }
     }
 }

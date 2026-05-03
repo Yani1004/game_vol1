@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RadialGradient
@@ -101,7 +100,11 @@ class ArPinModelView @JvmOverloads constructor(
 
     private class FallbackPinView(context: Context) : View(context) {
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private val pointPath = Path()
         private var rotation = 0f
+        private var cachedWidth = 0
+        private var cachedHeight = 0
+        private var shadowShader: RadialGradient? = null
 
         private val animator = ValueAnimator.ofFloat(0f, 360f).apply {
             duration = 2600L
@@ -122,16 +125,35 @@ class ArPinModelView @JvmOverloads constructor(
             super.onDetachedFromWindow()
         }
 
+        override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+            super.onSizeChanged(w, h, oldw, oldh)
+            cachedWidth = w
+            cachedHeight = h
+            val width = w.toFloat()
+            val height = h.toFloat()
+            shadowShader = RadialGradient(
+                width / 2f,
+                height * 0.78f,
+                width * 0.34f,
+                0x8838BDF8.toInt(),
+                Color.TRANSPARENT,
+                Shader.TileMode.CLAMP,
+            )
+        }
+
         override fun onDraw(canvas: Canvas) {
             super.onDraw(canvas)
             val w = width.toFloat()
             val h = height.toFloat()
+            if (cachedWidth != width || cachedHeight != height) {
+                onSizeChanged(width, height, cachedWidth, cachedHeight)
+            }
             val cx = w / 2f
             val cy = h * 0.42f
             val pulse = 0.92f + 0.08f * sin(Math.toRadians(rotation.toDouble())).toFloat()
             val tilt = cos(Math.toRadians(rotation.toDouble())).toFloat()
 
-            paint.shader = RadialGradient(cx, h * 0.78f, w * 0.34f, 0x8838BDF8.toInt(), Color.TRANSPARENT, Shader.TileMode.CLAMP)
+            paint.shader = shadowShader
             canvas.drawOval(cx - w * 0.34f, h * 0.70f, cx + w * 0.34f, h * 0.86f, paint)
             paint.shader = null
 
@@ -145,9 +167,8 @@ class ArPinModelView @JvmOverloads constructor(
             val top = cy - bodyHeight * 0.72f
             val bottom = cy + bodyHeight * 0.72f
 
-            paint.shader = LinearGradient(left, top, right, bottom, 0xFFEF4444.toInt(), 0xFFF97316.toInt(), Shader.TileMode.CLAMP)
+            paint.color = 0xFFF97316.toInt()
             canvas.drawOval(left, top, right, bottom, paint)
-            paint.shader = null
 
             paint.color = 0xAA07111F.toInt()
             canvas.drawCircle(cx + bodyWidth * 0.08f, cy - bodyHeight * 0.05f, bodyWidth * 0.42f, paint)
@@ -155,15 +176,13 @@ class ArPinModelView @JvmOverloads constructor(
             paint.color = 0xFFF8FAFC.toInt()
             canvas.drawCircle(cx + bodyWidth * 0.08f, cy - bodyHeight * 0.05f, bodyWidth * 0.25f, paint)
 
-            paint.shader = LinearGradient(cx, cy + bodyHeight * 0.35f, cx, h * 0.86f, 0xFFEF4444.toInt(), 0xFFF59E0B.toInt(), Shader.TileMode.CLAMP)
-            val point = Path().apply {
-                moveTo(cx - bodyWidth * 0.48f, cy + bodyHeight * 0.35f)
-                lineTo(cx + bodyWidth * 0.48f, cy + bodyHeight * 0.35f)
-                lineTo(cx, h * 0.86f)
-                close()
-            }
-            canvas.drawPath(point, paint)
-            paint.shader = null
+            paint.color = 0xFFEF4444.toInt()
+            pointPath.reset()
+            pointPath.moveTo(cx - bodyWidth * 0.48f, cy + bodyHeight * 0.35f)
+            pointPath.lineTo(cx + bodyWidth * 0.48f, cy + bodyHeight * 0.35f)
+            pointPath.lineTo(cx, h * 0.86f)
+            pointPath.close()
+            canvas.drawPath(pointPath, paint)
 
             paint.style = Paint.Style.STROKE
             paint.strokeWidth = 6f

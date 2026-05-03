@@ -2,81 +2,63 @@ package com.example.game_vol1.admin
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.drawerlayout.widget.DrawerLayout
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import com.example.game_vol1.GeoLoginActivity
-import com.example.game_vol1.R
+import com.example.game_vol1.HuntAction
+import com.example.game_vol1.HuntColors
 import com.example.game_vol1.admin.viewmodel.AdminDashboardViewModel
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.navigation.NavigationView
 
 class AdminDashboardActivity : AppCompatActivity() {
-
     private val vm: AdminDashboardViewModel by viewModels()
-    private lateinit var drawer: DrawerLayout
+    private var playerCount by mutableIntStateOf(0)
+    private var locationCount by mutableIntStateOf(0)
+    private var gameCount by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         if (!AdminAccessManager.enforceAdminOrRedirect(this)) return
-
-        setContentView(R.layout.activity_admin_dashboard)
-
-        val toolbar = findViewById<Toolbar>(R.id.adminToolbar)
-        setSupportActionBar(toolbar)
-
-        drawer = findViewById(R.id.adminDrawerLayout)
-        val toggle = ActionBarDrawerToggle(
-            this, drawer, toolbar,
-            R.string.nav_drawer_open, R.string.nav_drawer_close
-        )
-        drawer.addDrawerListener(toggle)
-        toggle.syncState()
-
-        setupNavigation()
-        observeStats()
-        setupQuickActions()
-    }
-
-    private fun setupNavigation() {
-        val navView = findViewById<NavigationView>(R.id.adminNavView)
-        navView.setNavigationItemSelectedListener { item ->
-            drawer.closeDrawers()
-            when (item.itemId) {
-                R.id.nav_dashboard -> { /* already here */ }
-                R.id.nav_add_geo -> startActivity(Intent(this, AddGeoLocationActivity::class.java))
-                R.id.nav_manage_geo -> startActivity(Intent(this, ManageGeoLocationsActivity::class.java))
-                R.id.nav_players -> startActivity(Intent(this, ViewPlayersActivity::class.java))
-                R.id.nav_logout -> {
+        vm.playerCount.observe(this) { playerCount = it ?: 0 }
+        vm.geoLocationCount.observe(this) { locationCount = it ?: 0 }
+        vm.totalGamesCount.observe(this) { gameCount = it ?: 0 }
+        setContent {
+            AdminDashboardScreen(
+                playerCount,
+                locationCount,
+                gameCount,
+                onAddPlace = { startActivity(Intent(this, AddGeoLocationActivity::class.java)) },
+                onManagePlaces = { startActivity(Intent(this, ManageGeoLocationsActivity::class.java)) },
+                onPlayers = { startActivity(Intent(this, ViewPlayersActivity::class.java)) },
+                onLogout = {
                     AdminAccessManager.logout(this)
                     startActivity(Intent(this, GeoLoginActivity::class.java))
                     finishAffinity()
-                }
-            }
-            true
+                },
+            )
         }
     }
+}
 
-    private fun observeStats() {
-        vm.playerCount.observe(this) { findViewById<TextView>(R.id.tvStatPlayers).text = it.toString() }
-        vm.geoLocationCount.observe(this) { findViewById<TextView>(R.id.tvStatLocations).text = it.toString() }
-        vm.totalGamesCount.observe(this) { findViewById<TextView>(R.id.tvStatGames).text = it.toString() }
+@Composable
+private fun AdminDashboardScreen(
+    players: Int,
+    places: Int,
+    games: Int,
+    onAddPlace: () -> Unit,
+    onManagePlaces: () -> Unit,
+    onPlayers: () -> Unit,
+    onLogout: () -> Unit,
+) {
+    AdminScrollScreen("Admin Dashboard", "Tune the game world without leaving the app.") {
+        AdminMetricRow("Players" to players.toString(), "Places" to places.toString(), "Games" to games.toString())
+        HuntAction("Add Place", "Create a new playable location.", HuntColors.Green, onAddPlace)
+        HuntAction("Manage Places", "Edit coordinates, difficulty, photos, and descriptions.", HuntColors.Blue, onManagePlaces)
+        HuntAction("Players", "Review player progress and game history.", HuntColors.Gold, onPlayers)
+        HuntAction("Log Out", "Return to the player login screen.", HuntColors.Rose, onLogout)
     }
-
-    private fun setupQuickActions() {
-        findViewById<MaterialButton>(R.id.btnQuickAddGeo).setOnClickListener {
-            startActivity(Intent(this, AddGeoLocationActivity::class.java))
-        }
-        findViewById<MaterialButton>(R.id.btnQuickManageGeo).setOnClickListener {
-            startActivity(Intent(this, ManageGeoLocationsActivity::class.java))
-        }
-        findViewById<MaterialButton>(R.id.btnQuickViewPlayers).setOnClickListener {
-            startActivity(Intent(this, ViewPlayersActivity::class.java))
-        }
-    }
-
 }

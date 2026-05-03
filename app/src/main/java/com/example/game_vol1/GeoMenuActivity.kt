@@ -1,73 +1,75 @@
-﻿package com.example.game_vol1
+package com.example.game_vol1
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.game_vol1.admin.AdminAccessManager
 import com.example.game_vol1.admin.AdminDashboardActivity
 import com.example.game_vol1.data.GameRepository
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.game_vol1.models.DailyChallenge
+import com.example.game_vol1.models.PlayerProfile
+import com.example.game_vol1.models.TeamInfo
 
 class GeoMenuActivity : AppCompatActivity() {
-    companion object {
-        private const val NOTIFICATION_PERMISSION_REQUEST = 301
+    private var profile by mutableStateOf<PlayerProfile?>(null)
+    private var daily by mutableStateOf<DailyChallenge?>(null)
+    private var team by mutableStateOf<TeamInfo?>(null)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setupNotifications()
+        refresh()
+        setContent {
+            HomeScreen(
+                activity = this,
+                profile = profile,
+                daily = daily,
+                team = team,
+                isAdmin = AdminAccessManager.isAdmin(this),
+                onExplore = { startActivity(Intent(this, ExplorerMapActivity::class.java)) },
+                onGoals = { startActivity(Intent(this, GoalsActivity::class.java)) },
+                onHistory = { startActivity(Intent(this, DiscoveriesActivity::class.java)) },
+                onTeam = { startActivity(Intent(this, TeamActivity::class.java)) },
+                onAdmin = { startActivity(Intent(this, AdminDashboardActivity::class.java)) },
+                onLogout = {
+                    GameRepository.logout(this)
+                    startActivity(Intent(this, GeoLoginActivity::class.java))
+                    finishAffinity()
+                },
+            )
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        renderScreen()
+        refresh()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.geo_activity_menu_v2)
-
-        findViewById<Button>(R.id.btnPlayRun).setOnClickListener {
-            startActivity(Intent(this, ExplorerMapActivity::class.java))
-        }
-
-        findViewById<Button>(R.id.btnGoals).setOnClickListener {
-            startActivity(Intent(this, GoalsActivity::class.java))
-        }
-
-        findViewById<Button>(R.id.btnCollectionNew).setOnClickListener {
-            startActivity(Intent(this, DiscoveriesActivity::class.java))
-        }
-
-        findViewById<Button>(R.id.btnTeam).setOnClickListener {
-            startActivity(Intent(this, TeamActivity::class.java))
-        }
-
-        findViewById<Button>(R.id.btnAdminPanel).setOnClickListener {
-            startActivity(Intent(this, AdminDashboardActivity::class.java))
-        }
-
-        findViewById<Button>(R.id.btnLogout).setOnClickListener {
-            GameRepository.logout(this)
-            startActivity(Intent(this, GeoLoginActivity::class.java))
-            finishAffinity()
-        }
-
-        listOf(
-            R.id.btnPlayRun,
-            R.id.btnGoals,
-            R.id.btnCollectionNew,
-            R.id.btnTeam,
-            R.id.btnAdminPanel,
-            R.id.btnLogout,
-        ).forEach { findViewById<Button>(it).applyPressFeedback() }
-        findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
-
-        setupNotifications()
-        renderScreen()
+    private fun refresh() {
+        profile = GameRepository.loadProfile(this)
+        daily = GameRepository.getDailyChallenge()
+        team = GameRepository.loadTeam(this)
     }
 
     private fun setupNotifications() {
@@ -75,97 +77,64 @@ class GeoMenuActivity : AppCompatActivity() {
             NotificationScheduler.ensureDailyReminderScheduled(this)
             return
         }
-
-        val hasPermission = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.POST_NOTIFICATIONS
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (hasPermission) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             NotificationScheduler.ensureDailyReminderScheduled(this)
-            return
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATION_PERMISSION_REQUEST)
         }
-
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-            NOTIFICATION_PERMISSION_REQUEST
-        )
     }
 
-    private fun renderScreen() {
-        val profile = GameRepository.loadProfile(this)
-        val daily = GameRepository.getDailyChallenge()
-        val team = GameRepository.loadTeam(this)
-        val isBg = UiLanguageStore.isBulgarian(this)
-
-        findViewById<TextView>(R.id.tvProfileSection).text = UiLanguageStore.pick(this, "Профил", "Profile")
-        findViewById<TextView>(R.id.tvProfileIntro).text =
-            UiLanguageStore.pick(this, "Твоят център за откриване на места, отбори и дневни цели.", "Your base for exploring landmarks, teams, and daily goals.")
-        findViewById<TextView>(R.id.tvVisitedLabel).text = UiLanguageStore.pick(this, "Посетени места", "Places visited")
-        findViewById<TextView>(R.id.tvScoreLabel).text = UiLanguageStore.pick(this, "Общо точки", "Total score")
-        findViewById<TextView>(R.id.tvRouteLabel).text = UiLanguageStore.pick(this, "Днешен маршрут", "Today's Route")
-        findViewById<TextView>(R.id.tvDailySubcopy).text =
-            UiLanguageStore.pick(this, "Излез навън, открий място и поддържай прогреса си жив.", "Head out, discover a place, and keep your streak alive.")
-        findViewById<TextView>(R.id.tvQuickActionsLabel).text = UiLanguageStore.pick(this, "Бързи действия", "Quick Actions")
-        findViewById<TextView>(R.id.tvHistoryCardTitle).text = UiLanguageStore.pick(this, "История", "History")
-        findViewById<TextView>(R.id.tvHistoryCardMeta).text =
-            if (isBg) "${profile.visitedCount} места" else "${profile.visitedCount} places"
-        findViewById<TextView>(R.id.tvProfileHistoryHint).text =
-            UiLanguageStore.pick(this, "Прегледай откритите обекти и бележките си.", "Revisit your discovered landmarks and notes.")
-        findViewById<TextView>(R.id.tvDailyCardTitle).text = UiLanguageStore.pick(this, "Дневни", "Daily")
-        findViewById<TextView>(R.id.tvDailyCardMeta).text =
-            if (isBg) "+${daily.bonusPoints} бонус" else "+${daily.bonusPoints} bonus"
-        findViewById<TextView>(R.id.tvProfileDailyHint).text =
-            UiLanguageStore.pick(this, "Следи бонус задачата и статуса на изпълнение.", "Track the bonus challenge and completion status.")
-        findViewById<TextView>(R.id.tvTeamCardTitle).text = UiLanguageStore.pick(this, "Отбор", "Team Play")
-        findViewById<TextView>(R.id.tvTeamMeta).text =
-            if (team.hasTeam) {
-                if (isBg) "${team.memberNames.size} членове" else "${team.memberNames.size} members"
-            } else {
-                UiLanguageStore.pick(this, "Нямаш активен отбор", "No active team")
-            }
-        findViewById<Button>(R.id.btnPlayRun).text = UiLanguageStore.pick(this, "Към картата", "Jump Into Explore")
-        findViewById<Button>(R.id.btnCollectionNew).text = UiLanguageStore.pick(this, "Отвори", "Open")
-        findViewById<Button>(R.id.btnGoals).text = UiLanguageStore.pick(this, "Виж", "View")
-        findViewById<Button>(R.id.btnTeam).text = UiLanguageStore.pick(this, "Отвори отбора", "Open Team Hub")
-        findViewById<Button>(R.id.btnAdminPanel).text = UiLanguageStore.pick(this, "Админ панел", "Admin Panel")
-        findViewById<Button>(R.id.btnLogout).text = UiLanguageStore.pick(this, "Изход", "Log Out")
-        findViewById<Button>(R.id.btnAdminPanel).visibility =
-            if (AdminAccessManager.isAdmin(this)) View.VISIBLE else View.GONE
-
-        findViewById<TextView>(R.id.tvUsername).text = profile.username
-        findViewById<TextView>(R.id.tvVisitedValue).text = profile.visitedCount.toString()
-        findViewById<TextView>(R.id.tvScoreValue).text = profile.totalScore.toString()
-        findViewById<TextView>(R.id.tvDailyHighlight).text =
-            if (isBg) "${daily.place.title} (+${daily.bonusPoints})"
-            else "${daily.place.title} (+${daily.bonusPoints})"
-        findViewById<TextView>(R.id.tvTeamSummary).text =
-            if (team.hasTeam) {
-                if (isBg) {
-                    "${team.teamName} е твоят активен отбор. Продължете да откривате места и да качвате общия резултат."
-                } else {
-                    "${team.teamName} is your active team. Keep discovering places and push the shared score higher."
-                }
-            } else {
-                UiLanguageStore.pick(this, "Създай отбор, покани приятели и трупайте точки заедно.", "Create a team, invite friends, and earn score together.")
-            }
-
-        AppNavigation.bind(this, findViewById<BottomNavigationView>(R.id.bottomNav), R.id.nav_profile)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == NOTIFICATION_PERMISSION_REQUEST &&
-            grantResults.isNotEmpty() &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
             NotificationScheduler.ensureDailyReminderScheduled(this)
+        }
+    }
+
+    companion object {
+        private const val NOTIFICATION_PERMISSION_REQUEST = 301
+    }
+}
+
+@Composable
+private fun HomeScreen(
+    activity: GeoMenuActivity,
+    profile: PlayerProfile?,
+    daily: DailyChallenge?,
+    team: TeamInfo?,
+    isAdmin: Boolean,
+    onExplore: () -> Unit,
+    onGoals: () -> Unit,
+    onHistory: () -> Unit,
+    onTeam: () -> Unit,
+    onAdmin: () -> Unit,
+    onLogout: () -> Unit,
+) {
+    HuntTheme {
+        HuntScaffold(activity = activity, selected = "profile") { modifier ->
+            Column(
+                modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                HuntTitle(profile?.username ?: "Explorer", "Your base for landmarks, teams, and daily goals.")
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    HuntMetric("Visited", profile?.visitedCount?.toString() ?: "0", Modifier.weight(1f), HuntColors.Green)
+                    HuntMetric("Score", profile?.totalScore?.toString() ?: "0", Modifier.weight(1f), HuntColors.Gold)
+                }
+                HuntPanel(accent = HuntColors.Blue) {
+                    Text("Today's Route", color = HuntColors.Text, fontWeight = FontWeight.Black)
+                    Text(daily?.place?.title ?: "Loading daily place", color = HuntColors.BlueSoft, fontWeight = FontWeight.Bold)
+                    Text("Discover it today for +${daily?.bonusPoints ?: 0} bonus points.", color = HuntColors.Muted)
+                    HuntButton("Jump Into Explore", onExplore, color = HuntColors.Blue)
+                }
+                HuntAction("History", "${profile?.visitedCount ?: 0} places discovered", HuntColors.Rose, onHistory)
+                HuntAction("Daily", "Track the challenge board.", HuntColors.Gold, onGoals)
+                HuntAction("Team Play", team?.takeIf { it.hasTeam }?.let { "${it.teamName} | ${it.memberNames.size} members" } ?: "Create or join a team.", HuntColors.Green, onTeam)
+                if (isAdmin) {
+                    HuntAction("Admin Panel", "Manage players and game locations.", HuntColors.Blue, onAdmin)
+                }
+                HuntButton("Log Out", onLogout, color = HuntColors.SlateLight)
+            }
         }
     }
 }
