@@ -45,7 +45,7 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
     private var captureSession: CameraCaptureSession? = null
     private var cameraThread: HandlerThread? = null
     private var cameraHandler: Handler? = null
-    private var placeId: String = "demo_discovery_point"
+    private var placeId: String = ""
     private var placeLatitude: Double? = null
     private var placeLongitude: Double? = null
     private var userLatitude: Double? = null
@@ -69,9 +69,9 @@ class ArDemoActivity : AppCompatActivity(), SensorEventListener {
         tvArLiveHelp = findViewById(R.id.tvArLiveHelp)
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-        val title = intent.getStringExtra(EXTRA_PLACE_TITLE) ?: "Demo Discovery Point"
-        val city = intent.getStringExtra(EXTRA_PLACE_CITY) ?: "Bansko"
-        placeId = intent.getStringExtra(EXTRA_PLACE_ID) ?: "demo_discovery_point"
+        val title = intent.getStringExtra(EXTRA_PLACE_TITLE) ?: "Selected place"
+        val city = intent.getStringExtra(EXTRA_PLACE_CITY) ?: "Bulgaria"
+        placeId = intent.getStringExtra(EXTRA_PLACE_ID) ?: ""
         val place = GameRepository.placeById(placeId)
         placeLatitude = if (intent.hasExtra(EXTRA_PLACE_LATITUDE)) {
             intent.getDoubleExtra(EXTRA_PLACE_LATITUDE, 0.0)

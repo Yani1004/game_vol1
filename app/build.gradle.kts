@@ -31,8 +31,12 @@ android {
         val mapsApiKey = (project.findProperty("MAPS_API_KEY") as? String)
             ?: localProperties.getProperty("MAPS_API_KEY")
             ?: ""
-        val adminEmail = (project.findProperty("ADMIN_EMAIL") as? String) ?: "admin@geoguesser.com"
-        val adminPassword = (project.findProperty("ADMIN_PASSWORD") as? String) ?: "Admin@2024"
+        val adminEmail = (project.findProperty("ADMIN_EMAIL") as? String)
+            ?: localProperties.getProperty("ADMIN_EMAIL")
+            ?: ""
+        val adminPassword = (project.findProperty("ADMIN_PASSWORD") as? String)
+            ?: localProperties.getProperty("ADMIN_PASSWORD")
+            ?: ""
 
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         buildConfigField("String", "ADMIN_EMAIL", "\"$adminEmail\"")

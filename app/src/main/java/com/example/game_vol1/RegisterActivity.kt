@@ -28,7 +28,7 @@ class RegisterActivity : AppCompatActivity() {
         findViewById<android.view.View>(android.R.id.content).fadeSlideIn()
 
         fun applyLanguage() {
-            titleView.text = if (MultiplayerRepository.isAvailable(this)) "Create Multiplayer Account" else "Create Demo Account"
+            titleView.text = if (MultiplayerRepository.isAvailable(this)) "Create Multiplayer Account" else "Create Local Account"
             nameInput.hint = "Explorer name"
             emailInput.hint = "Email"
             passwordInput.hint = "Password"

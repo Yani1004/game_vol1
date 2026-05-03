@@ -17,6 +17,7 @@ object AdminAccessManager {
         get() = BuildConfig.ADMIN_PASSWORD
 
     fun login(context: Context, email: String, password: String): Boolean {
+        if (ADMIN_EMAIL.isBlank() || adminPassword.isBlank()) return false
         val isValid = email.trim().equals(ADMIN_EMAIL, ignoreCase = true) && password == adminPassword
         if (isValid) {
             context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

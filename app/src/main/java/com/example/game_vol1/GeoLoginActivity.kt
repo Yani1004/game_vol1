@@ -35,7 +35,7 @@ class GeoLoginActivity : AppCompatActivity() {
             subtitleView.text = if (MultiplayerRepository.isAvailable(this)) {
                 "Sign in to compete on the live leaderboard from any device."
             } else {
-                "Firebase is not configured yet, so this build uses local demo login."
+                "Firebase is not configured yet, so this build stores your account locally."
             }
             emailInput.hint = "Email"
             passwordInput.hint = "Password"

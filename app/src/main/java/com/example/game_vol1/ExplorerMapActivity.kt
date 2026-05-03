@@ -7,6 +7,7 @@ import android.location.Location
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -32,6 +33,7 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var tvSelectedPlace: TextView
     private lateinit var tvDistance: TextView
     private lateinit var tvPlaceInfo: TextView
+    private lateinit var ivPlacePhoto: ImageView
     private lateinit var btnDiscover: Button
     private lateinit var btnCamera: Button
     private lateinit var btnDaily: Button
@@ -54,6 +56,7 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         tvSelectedPlace = findViewById(R.id.tvSelectedPlace)
         tvDistance = findViewById(R.id.tvDistance)
         tvPlaceInfo = findViewById(R.id.tvPlaceInfo)
+        ivPlacePhoto = findViewById(R.id.ivPlacePhoto)
         btnDiscover = findViewById(R.id.btnDiscoverPlace)
         btnCamera = findViewById(R.id.btnOpenCamera)
         btnDaily = findViewById(R.id.btnOpenDaily)
@@ -165,6 +168,7 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
         noPlaceButtons.visibility = View.GONE
         tvSelectedPlace.text = "${place.title} | ${place.city}"
         tvPlaceInfo.text = "${place.shortDescription}\n\n${place.historicalInfo}"
+        PlaceImageLoader.loadInto(ivPlacePhoto, place)
 
         val current = currentLocation
         if (current == null) {
@@ -245,17 +249,23 @@ class ExplorerMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun openArCamera() {
-        val place = selectedPlace ?: GameRepository.placeById("demo_discovery_point")
+        val place = selectedPlace
+        if (place == null) {
+            Toast.makeText(
+                this,
+                UiLanguageStore.pick(this, "Първо избери обект от картата.", "Choose a place marker first."),
+                Toast.LENGTH_SHORT,
+            ).show()
+            return
+        }
         val location = currentLocation
         startActivity(
             Intent(this, ArDemoActivity::class.java).apply {
-                putExtra(ArDemoActivity.EXTRA_PLACE_TITLE, place?.title ?: "Demo Discovery Point")
-                putExtra(ArDemoActivity.EXTRA_PLACE_CITY, place?.city ?: "Bansko")
-                putExtra(ArDemoActivity.EXTRA_PLACE_ID, place?.id ?: "demo_discovery_point")
-                if (place != null) {
-                    putExtra(ArDemoActivity.EXTRA_PLACE_LATITUDE, place.latitude)
-                    putExtra(ArDemoActivity.EXTRA_PLACE_LONGITUDE, place.longitude)
-                }
+                putExtra(ArDemoActivity.EXTRA_PLACE_TITLE, place.title)
+                putExtra(ArDemoActivity.EXTRA_PLACE_CITY, place.city)
+                putExtra(ArDemoActivity.EXTRA_PLACE_ID, place.id)
+                putExtra(ArDemoActivity.EXTRA_PLACE_LATITUDE, place.latitude)
+                putExtra(ArDemoActivity.EXTRA_PLACE_LONGITUDE, place.longitude)
                 if (location != null) {
                     putExtra(ArDemoActivity.EXTRA_USER_LATITUDE, location.latitude)
                     putExtra(ArDemoActivity.EXTRA_USER_LONGITUDE, location.longitude)

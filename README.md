@@ -2,15 +2,16 @@
 
 Heritage Hunt is an Android location-based game for discovering cultural and historical places in Bulgaria. Players explore a Google Map, visit real-world coordinates, open an AR camera view, scan a 3D location pin, earn points, complete a daily challenge, and compete through team leaderboards.
 
-The project is built as a mobile programming coursework app, but the current codebase already includes a working game loop, local demo mode, optional Firebase multiplayer support, an admin panel, Google Maps, GPS checks, camera preview, and a packaged 3D AR pin model.
+The project is built as a mobile programming coursework app, but the current codebase already includes a working game loop, local offline mode, optional Firebase multiplayer support, an admin panel, Google Maps, GPS checks, camera preview, and a packaged 3D AR pin model.
 
 ## Features
 
 - Account registration and login
-- Local demo profile storage with `SharedPreferences`
+- Local profile storage with `SharedPreferences`
 - Optional Firebase Authentication and Firestore integration
-- Google Maps screen with heritage place markers
+- Google Maps screen with Bulgaria's 100 National Tourist Sites as markers
 - GPS distance checks before a place can be discovered
+- Place detail cards with online Wikimedia/Wikipedia thumbnail images
 - AR camera screen with a 3D location pin model
 - Discovery radius of 30 meters
 - Compass direction check before the AR pin appears
@@ -46,7 +47,7 @@ Important: the current AR flow does not use computer-vision image recognition of
 - Sceneform for 3D model rendering
 - Firebase Auth, Firestore, and Storage
 - Room database for admin/local structured data
-- SharedPreferences for local demo game state
+- SharedPreferences for local offline game state
 - Gradle Kotlin DSL
 
 ## Requirements
@@ -72,15 +73,15 @@ MAPS_API_KEY=your_google_maps_api_key
 Optional admin credentials can also be provided through Gradle properties or `local.properties`:
 
 ```properties
-ADMIN_EMAIL=admin@geoguesser.com
-ADMIN_PASSWORD=Admin@2024
+ADMIN_EMAIL=your_admin_email
+ADMIN_PASSWORD=your_admin_password
 ```
 
-If these are not provided, the Gradle defaults from `app/build.gradle.kts` are used.
+If these are not provided, admin login is disabled for that build.
 
 ## Firebase Setup
 
-Firebase is optional. Without Firebase, the app runs in local demo mode.
+Firebase is optional. Without Firebase, the app stores player progress locally on the device.
 
 To enable cloud login and multiplayer sync:
 
@@ -137,36 +138,44 @@ Grant the requested permissions when prompted:
 - Camera
 - Notifications, on Android versions that require runtime notification permission
 
-## Demo Login
+## Login
 
 For a normal player account in local mode, register a new account from the app.
 
-For admin access, use the configured admin credentials. By default:
-
-```text
-Email: admin@geoguesser.com
-Password: Admin@2024
-```
+For admin access, configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` in Gradle properties or `local.properties`.
 
 The admin entry point is available from the login screen.
 
 ## Included Places
 
-The local demo repository includes several Bulgarian heritage locations:
+The local repository includes 100 entries based on Bulgaria's `100 National Tourist Sites` movement.
+
+Examples include:
 
 - Alexander Nevsky Cathedral
 - Rila Monastery
-- Ancient Theatre of Philippopolis
-- Tsarevets Fortress
-- Old Nessebar
+- Plovdiv Roman Theatre
+- Tsarevets Archaeological Reserve
+- Nessebar Archaeological Museum
 - Belogradchik Rocks
-- Demo Discovery Point in Bansko
+- Seven Rila Lakes
+- Madara Rider
+- Thracian Tomb of Kazanlak
+- Pliska Archaeological Reserve
 
-The current static place list lives in:
+The current place catalog lives in:
+
+```text
+app/src/main/java/com/example/game_vol1/data/TouristSitesData.kt
+```
+
+The scoring and discovery logic lives in:
 
 ```text
 app/src/main/java/com/example/game_vol1/data/GameRepository.kt
 ```
+
+Place photos are loaded online from the direct `imageUrl` field when present, or from the Wikipedia summary thumbnail for each place's `wikipediaTitle`.
 
 ## AR Pin Asset
 
@@ -266,7 +275,7 @@ Additional coursework and setup documentation:
 - The heritage place list is mostly static in `GameRepository`.
 - The AR pin is location and compass gated, not detected through image recognition.
 - Firebase support is optional and depends on providing `google-services.json`.
-- Room is currently used mainly by the admin/local data layer, while the player demo flow uses local preferences and optional Firebase sync.
+- Room is currently used mainly by the admin/local data layer, while the player flow uses local preferences and optional Firebase sync.
 - Accurate discovery requires real device GPS and compass data.
 
 ## License

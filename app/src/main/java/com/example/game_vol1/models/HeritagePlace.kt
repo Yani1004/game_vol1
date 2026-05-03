@@ -10,4 +10,6 @@ data class HeritagePlace(
     val shortDescription: String,
     val historicalInfo: String,
     val category: String,
+    val wikipediaTitle: String = title,
+    val imageUrl: String = "",
 )

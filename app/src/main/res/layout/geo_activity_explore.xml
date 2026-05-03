@@ -125,6 +125,15 @@
             android:padding="16dp"
             android:visibility="gone">
 
+            <ImageView
+                android:id="@+id/ivPlacePhoto"
+                android:layout_width="match_parent"
+                android:layout_height="132dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/game_surface_high"
+                android:contentDescription="Place photo"
+                android:scaleType="centerCrop" />
+
             <TextView
                 android:id="@+id/tvSelectedPlace"
                 android:layout_width="match_parent"
@@ -232,40 +241,6 @@
                 android:text="Tap a map marker, then get within range to earn points."
                 android:textColor="@color/game_text_muted"
                 android:textSize="13sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_card_plain"
-                android:elevation="3dp"
-                android:orientation="vertical"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="National Museum                                      120 m"
-                    android:textColor="@color/game_text"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Old Tower                                                250 m"
-                    android:textColor="@color/game_text"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="City Hall                                                  480 m"
-                    android:textColor="@color/game_text"
-                    android:textSize="12sp" />
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

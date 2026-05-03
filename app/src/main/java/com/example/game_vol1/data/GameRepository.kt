@@ -24,91 +24,11 @@ object GameRepository {
     private const val KEY_COMPLETED_DAILY = "completed_daily"
     private const val KEY_TEAM_DIRECTORY = "team_directory"
     private const val KEY_CURRENT_TEAM_CODE = "current_team_code"
-    private const val ADMIN_EMAIL = "admin@geoguesser.local"
-    private const val ADMIN_PASSWORD = "admin123"
 
     private const val DISCOVERY_RADIUS_METERS = 30f
     private const val DAILY_BONUS_POINTS = 150
 
-    fun getPlaces(): List<HeritagePlace> = listOf(
-        HeritagePlace(
-            "alexander_nevsky",
-            "Alexander Nevsky Cathedral",
-            "Sofia",
-            "Bulgaria",
-            42.6953,
-            23.3328,
-            "Iconic cathedral in central Sofia with distinctive golden domes.",
-            "Built in the early 20th century as a memorial to soldiers from the Russo-Turkish War of 1877-1878.",
-            "Cathedral",
-        ),
-        HeritagePlace(
-            "rila_monastery",
-            "Rila Monastery",
-            "Rila",
-            "Bulgaria",
-            42.1338,
-            23.3405,
-            "Historic monastery in the Rila Mountains surrounded by forests.",
-            "Founded in the 10th century, it is one of Bulgaria's most important spiritual and cultural landmarks.",
-            "Monastery",
-        ),
-        HeritagePlace(
-            "plovdiv_theatre",
-            "Ancient Theatre of Philippopolis",
-            "Plovdiv",
-            "Bulgaria",
-            42.1466,
-            24.7510,
-            "Well-preserved Roman theatre still used for events.",
-            "Dating from the 1st century, it is among the best-preserved ancient theatres in the Balkans.",
-            "Ancient Site",
-        ),
-        HeritagePlace(
-            "tsarevets",
-            "Tsarevets Fortress",
-            "Veliko Tarnovo",
-            "Bulgaria",
-            43.0841,
-            25.6506,
-            "Medieval fortress on a hill above the old capital.",
-            "Tsarevets was the main stronghold of the Second Bulgarian Empire.",
-            "Fortress",
-        ),
-        HeritagePlace(
-            "nessebar_old_town",
-            "Old Nessebar",
-            "Nessebar",
-            "Bulgaria",
-            42.6598,
-            27.7360,
-            "Historic peninsula with churches, stone streets, and sea views.",
-            "A UNESCO World Heritage site with layers of Thracian, Greek, Roman, and Byzantine history.",
-            "Historic Town",
-        ),
-        HeritagePlace(
-            "belogradchik_rocks",
-            "Belogradchik Rocks",
-            "Belogradchik",
-            "Bulgaria",
-            43.6271,
-            22.6838,
-            "Striking red rock formations near the old fortress walls.",
-            "The formations stretch across a large area and are tied to local legends and medieval defense history.",
-            "Natural Landmark",
-        ),
-        HeritagePlace(
-            "demo_discovery_point",
-            "Demo Discovery Point",
-            "Bansko",
-            "Bulgaria",
-            41.88460040487995,
-            23.461743142766196,
-            "Temporary demo location added for the project presentation.",
-            "This point is available as a nearby place to discover during the demo.",
-            "Demo Location",
-        ),
-    )
+    fun getPlaces(): List<HeritagePlace> = TouristSitesData.places
 
     fun hasRegisteredAccount(context: Context): Boolean =
         prefs(context).getString(KEY_EMAIL, null) != null
@@ -144,19 +64,6 @@ object GameRepository {
 
     fun login(context: Context, email: String, password: String): Boolean {
         val normalizedEmail = email.trim().lowercase()
-        if (normalizedEmail == ADMIN_EMAIL && password == ADMIN_PASSWORD) {
-            prefs(context).edit()
-                .putString(KEY_NAME, "Admin")
-                .putString(KEY_EMAIL, ADMIN_EMAIL)
-                .putString(KEY_PASSWORD, ADMIN_PASSWORD)
-                .putString(KEY_ACTIVE_EMAIL, ADMIN_EMAIL)
-                .putInt(KEY_TOTAL_SCORE, 0)
-                .putString(KEY_VISITS, "")
-                .putString(KEY_COMPLETED_DAILY, "")
-                .apply()
-            return true
-        }
-
         val registeredEmail = prefs(context).getString(KEY_EMAIL, null)?.lowercase()
         val registeredPassword = prefs(context).getString(KEY_PASSWORD, null)
         val matches = registeredEmail == normalizedEmail && registeredPassword == password
@@ -426,46 +333,7 @@ object GameRepository {
 
     private fun ensureTeamDirectory(context: Context) {
         if ((prefs(context).getString(KEY_TEAM_DIRECTORY, "") ?: "").isNotBlank()) return
-
-        val seeded = listOf(
-            TeamInfo(
-                teamName = "City Sprinters",
-                description = "Fast-moving explorers focused on central city landmarks.",
-                inviteCode = "CITY2401",
-                ownerEmail = "owner1@demo.local",
-                maxMembers = 6,
-                isOpen = true,
-                memberNames = listOf("Mira", "Niki", "Toni"),
-                pendingRequests = emptyList(),
-                memberScores = mapOf("Mira" to 430, "Niki" to 290, "Toni" to 185),
-                teamScore = 905,
-            ),
-            TeamInfo(
-                teamName = "Fortress Finders",
-                description = "A locked team for players who love medieval places and long walks.",
-                inviteCode = "FORT5512",
-                ownerEmail = "owner2@demo.local",
-                maxMembers = 5,
-                isOpen = false,
-                memberNames = listOf("Alex", "Bobi"),
-                pendingRequests = listOf("Kris"),
-                memberScores = mapOf("Alex" to 510, "Bobi" to 360),
-                teamScore = 870,
-            ),
-            TeamInfo(
-                teamName = "Sea Legends",
-                description = "Coastal place hunters collecting old towns and sea views.",
-                inviteCode = "SEA7730",
-                ownerEmail = "owner3@demo.local",
-                maxMembers = 4,
-                isOpen = true,
-                memberNames = listOf("Vesi"),
-                pendingRequests = emptyList(),
-                memberScores = mapOf("Vesi" to 260),
-                teamScore = 260,
-            ),
-        )
-        saveAllTeams(context, seeded)
+        saveAllTeams(context, emptyList())
     }
 
     private fun loadAllTeams(context: Context): List<TeamInfo> {
